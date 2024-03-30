@@ -3,7 +3,38 @@ import { PrismaClient } from '@prisma/client'
 import cloudinary from '../config/cloudinaryConfig.js'
 
 const prisma = new PrismaClient()
+export const getQuiz = async (req, res) => {
+    try {
+        const response = await prisma.Quiz.findMany({
+            include: {
+                user: true,
+                tags: true,
+            },
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ msg: error.message });
+    }
+};
 
+export const getQuizByUser = async (req, res) => {
+    const userId = req.params.userId; // mengambil userId dari parameter
+    try {
+        const response = await prisma.Quiz.findMany({
+            where: {
+                userId: Number(userId), // filter berdasarkan userId
+            },
+            include: {
+                tags: true,
+                user: true,
+            },
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ msg: error.message });
+    }
+
+}
 export const createQuiz = async (req, res) => {
     try {
         const { title, jumlahSoal, link, userId, tags } = req.body
@@ -66,4 +97,5 @@ export const createQuiz = async (req, res) => {
         console.log(error)
         return res.status(500).json({ msg: 'Terjadi kesalahan saat membuat quiz baru' })
     }
+
 }

@@ -1,24 +1,23 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter, Routes, Route} from 'react-router-dom';
+import QuizKreatif from './page/QuizKreatif';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<QuizKreatif/>}/>
+        {/* <Route path="/signup" element={<SignUp/>}/>
+        <Route path="/dashboard" element={<Dashboard/>}/>
+        <Route path="/influencer-detail/:username" element={<StatistikInfluencer/>}/>
+        <Route path="/video-detail" element={<VideoDetail/>}/>
+        <Route path="/statistic-prediction/:username" element={<PrediksiStatistik/>}/>
+        <Route path="/search-by-keyword" element={<SearchByKeyword/>}/>
+        <Route path="/search-influencer/:keyword" element={<TopInfluencer/>}/>
+        <Route path="/search-content/:keyword" element={<TopContent/>}/> */}
+        {/* <Route path="/search-influencer" element={<SearchByKeyword/>}/> */}
+      </Routes>
+    </BrowserRouter>
   );
 }
 
