@@ -1,12 +1,14 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route} from 'react-router-dom';
 import QuizKreatif from './page/QuizKreatif';
+import TambahQuiz from './page/TambahQuiz';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<QuizKreatif/>}/>
+        <Route path="/tambah-quiz" element={<TambahQuiz/>}/>
         {/* <Route path="/signup" element={<SignUp/>}/>
         <Route path="/dashboard" element={<Dashboard/>}/>
         <Route path="/influencer-detail/:username" element={<StatistikInfluencer/>}/>
