@@ -35,6 +35,145 @@ export const getQuizByUser = async (req, res) => {
     }
 
 }
+
+export const editQuiz = async (req, res) => {
+    try {
+        const quizId = parseInt(req.params.quizId, 10);
+        const { title, jumlahSoal, link, userId, tags } = req.body;
+
+        if (!title || !jumlahSoal || !link || !userId) {
+            return res.status(400).json({ msg: 'Semua field harus diisi' });
+        }
+
+        const tagsArray = Array.isArray(tags) ? tags : [];
+
+        const updatedTags = tagsArray.map(tag => ({
+            where: { nameTag: tag.nameTag }, // Gunakan `nameTag` sebagai kriteria pemilihan tag
+            create: { nameTag: tag.nameTag } // Buat tag baru jika tidak ditemukan
+        }));
+
+        const existingQuiz = await prisma.quiz.findUnique({
+            where: { id: quizId },
+            include: { tags: true },
+        });
+
+        if (!existingQuiz) {
+            return res.status(404).json({ msg: 'Quiz tidak ditemukan' });
+        }
+
+        const image = req.file ? req.file.path : existingQuiz.image;
+         
+        // Upload gambar ke Cloudinary
+         let cloudinaryImage;
+         if (image) {
+             cloudinaryImage = await cloudinary.uploader.upload(image);
+         }
+
+        // Temukan tag untuk diputuskan koneksi (hapus)
+        const tagsToDisconnect = existingQuiz.tags.filter(existingTag =>
+            !tagsArray.some(newTag => newTag.nameTag === existingTag.nameTag)
+        );
+
+        const updatedQuiz = await prisma.quiz.update({
+            where: { id: quizId },
+            data: {
+                title,
+                jumlahSoal: parseInt(jumlahSoal),
+                link,
+                image: cloudinaryImage ? cloudinaryImage.secure_url : null,
+                user: {
+                    connect: { id: parseInt(userId) }
+                },
+                tags: {
+                    connectOrCreate: updatedTags,
+                    disconnect: tagsToDisconnect.map(tag => ({ id: tag.id })),
+                }
+            },
+            include: {
+                tags: true
+            }
+        });
+
+        return res.status(200).json({
+            msg: 'Berhasil mengedit quiz',
+            data: {
+                id: updatedQuiz.id,
+                title: updatedQuiz.title,
+                jumlahSoal: updatedQuiz.jumlahSoal,
+                link: updatedQuiz.link,
+                image: updatedQuiz.image,
+                user: updatedQuiz.user,
+                tags: updatedQuiz.tags
+            }
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ msg: 'Terjadi kesalahan saat mengedit quiz' });
+    }
+};
+
+
+
+// export const editQuiz = async (req, res) => {
+//     try {
+//         const quizId = parseInt(req.params.quizId, 10);
+//         const { title, jumlahSoal, link, userId, tags } = req.body;
+//         const image = req.file ? req.file.path : null;
+
+//         if (!title || !jumlahSoal || !link || !userId) {
+//             return res.status(400).json({ msg: 'Semua field harus diisi' });
+//         }
+
+//         // Upload gambar ke Cloudinary
+//         let cloudinaryImage;
+//         if (image) {
+//             cloudinaryImage = await cloudinary.uploader.upload(image);
+//         }
+
+//         const tagsArray = Array.isArray(tags) ? tags : [];
+
+//         const updatedQuiz = await prisma.quiz.update({
+//             where: { id: parseInt(quizId) },
+//             data: {
+//                 title,
+//                 jumlahSoal: parseInt(jumlahSoal),
+//                 link,
+//                 image: cloudinaryImage ? cloudinaryImage.secure_url : null,
+//                 user: {
+//                     connect: { id: parseInt(userId) }
+//                 },
+//                 tags: {
+//                     connectOrCreate: tagsArray.map(tag => ({
+//                         where: { nameTag: tag.nameTag },
+//                         create: { nameTag: tag.nameTag }
+//                     }))
+//                 }
+//             },
+//             include: {
+//                 tags: true
+//             }
+//         });
+
+//         return res.status(200).json({
+//             msg: 'Berhasil mengedit quiz',
+//             data: {
+//                 id: updatedQuiz.id,
+//                 title: updatedQuiz.title,
+//                 jumlahSoal: updatedQuiz.jumlahSoal,
+//                 link: updatedQuiz.link,
+//                 image: updatedQuiz.image,
+//                 user: updatedQuiz.user,
+//                 tags: updatedQuiz.tags
+//             }
+//         });
+
+//     } catch (error) {
+//         console.log(error);
+//         return res.status(500).json({ msg: 'Terjadi kesalahan saat mengedit quiz' });
+//     }
+// };
+
 export const createQuiz = async (req, res) => {
     try {
         const { title, jumlahSoal, link, userId, tags } = req.body
