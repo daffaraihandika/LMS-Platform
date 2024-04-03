@@ -7,15 +7,15 @@ import bodyParser from "body-parser";
 
 dotenv.config();
 const app = express();
-app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
-app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 app.use(routes)
 
-app.listen(5000, ()=>{
-    console.log("server up and running");
+app.listen(5000, () => {
+    console.log("server up and running on http://localhost:5000");
 })
