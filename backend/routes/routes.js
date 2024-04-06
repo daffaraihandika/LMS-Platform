@@ -1,7 +1,7 @@
 import express from "express";
 import { upload } from "../middleware/multer.js";
 
-import { createQuiz, getQuizByUser, getQuiz, editQuiz } from "../controllers/quizController.js";
+import { createQuiz, getQuizByUser, getQuiz, editQuiz } from "../controllers/QuizController.js";
 
 
 const router = express.Router();
