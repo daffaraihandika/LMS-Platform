@@ -1,5 +1,4 @@
 import { React, useEffect, useState } from "react";
-
 import { Navbar, Container, Nav, Image } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -30,77 +29,98 @@ import {
 import axios from "axios";
 import ProgressBar from "react-bootstrap/ProgressBar"; // Import ProgressBar component from React Bootstrap
 import Select from "react-select";
+import Spinner from "react-bootstrap/Spinner"; // Import ProgressBar component from React Bootstrap
 
-
-const TambahQuiz = () => {
-
-    const [tags, setTags] = useState([]);
-
+const SaveQuiz = () => {
+    const [quizzes, setQuizzes] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
+    const [isDataComplete, setIsDataComplete] = useState(false);
 
-    const handleTambahQuizClick = () => {
-        if (file != null) {
-            localStorage.setItem("judulQuiz", document.getElementById("judulQuiz").value);
-            localStorage.setItem("tagQuiz", JSON.stringify(tags));
-            localStorage.setItem("deskripsiQuiz", document.getElementById("deskripsiQuiz").value);
+    const checkDataCompletion = () => {
+        const judulQuiz = localStorage.getItem("judulQuiz");
+        const tagQuiz = JSON.parse(localStorage.getItem("tagQuiz"));
+        const jumlahSoal = localStorage.getItem("deskripsiQuiz");
+        const selectedFileBase64 = localStorage.getItem("file");
 
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const base64String = reader.result;
-                localStorage.setItem("file", base64String);
-                navigate("/save-quiz"); // Pindah ke halaman selanjutnya setelah file berhasil disimpan
-            };
-            reader.readAsDataURL(file); // Membaca file sebagai base64 string
+        const dataComplete =
+            judulQuiz && tagQuiz && jumlahSoal && selectedFileBase64;
+        setIsDataComplete(dataComplete);
+    };
+
+    useEffect(() => {
+        checkDataCompletion();
+    }, []);
+
+    const handleSave = () => {
+        if (!isDataComplete) {
+            alert("Kamu harus melengkapi nilai2 di page sebelumnya ya");
+            return; // Hentikan eksekusi fungsi
+        }
+        setIsLoading(true);
+
+        const judulQuiz = localStorage.getItem("judulQuiz");
+        const tagQuiz = JSON.parse(localStorage.getItem("tagQuiz"));
+
+        const deskripsiQuiz = localStorage.getItem("deskripsiQuiz");
+        const selectedFileBase64 = localStorage.getItem("file");
+
+        if (selectedFileBase64 != null) {
+            // Konversi base64 string ke blob
+            const byteCharacters = atob(selectedFileBase64.split(",")[1]);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: "image/jpeg" });
+
+            // Buat objek File dari blob
+            const selectedFile = new File([blob], "selectedFile.jpg", {
+                type: "image/jpeg",
+            });
+            let link = document.getElementById("link").value;
+            if (link == "") {
+                alert("Harap isi link tersebut");
+                setIsLoading(false);
+            } else {
+                const formData = new FormData();
+                formData.append("title", judulQuiz);
+                formData.append("jumlahSoal", parseInt(deskripsiQuiz));
+                tagQuiz.forEach((tag, index) => {
+                    formData.append(`tags[${index}][nameTag]`, tag.value);  
+                });
+                formData.append("image", selectedFile);
+                formData.append("link", link);
+                formData.append("userId", 1);
+
+                axios
+                    .post("http://localhost:5000/new-quiz", formData)
+                    .then((response) => {
+                        setIsLoading(false);
+                        console.log("Data berhasil disimpan:", response.data);
+                        alert("Data berhasil disimpan");
+                        // Hapus data dari localStorage setelah berhasil disimpan
+                        localStorage.removeItem("judulQuiz");
+                        localStorage.removeItem("tagQuiz");
+                        localStorage.removeItem("deskripsiQuiz");
+                        localStorage.removeItem("file");
+                        navigate("/");
+                    })
+                    .catch((error) => {
+                        setIsLoading(false);
+                        console.error("Gagal menyimpan data:", error);
+                        alert(error);
+                    });
+            }
         } else {
-            alert("Harap pilih gambar")
+            setIsLoading(false);
+            alert("Harap lengkapi data di page sebelumnya");
+            navigate(-1);
+            return;
         }
     };
-
-
-
-    const handleChange = (selectedOptions) => {
-        setTags(selectedOptions);
-    };
-
-    const tagOptions = [
-        { value: "tag1", label: "Tag 1" },
-        { value: "tag2", label: "Tag 2" },
-        { value: "tag3", label: "Tag 3" },
-    ];
-
-    const customStyles = {
-        multiValue: (styles) => ({
-            ...styles,
-            backgroundColor: "orange",
-        }),
-        multiValueLabel: (styles) => ({
-            ...styles,
-            color: "white",
-        }),
-    };
-
-
-    const [file, setFile] = useState(null);
-
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-    };
-
-    const handleDrop = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const droppedFile = e.dataTransfer.files[0];
-        setFile(droppedFile);
-    };
-
-    const handleFileInputChange = (e) => {
-        const selectedFile = e.target.files[0];
-        setFile(selectedFile);
-    };
-
 
     return (
         <div>
@@ -135,6 +155,9 @@ const TambahQuiz = () => {
                             <h1>
                                 <b>Quiz Kreatif</b>
                             </h1>
+                        </div>
+                        <div className="mx-auto">
+                            {isLoading && <Spinner animation="border" />}
                         </div>
                         <div className="header d-flex justify-content-between align-items-center">
                             <div className="container mt-5 mx-5">
@@ -200,9 +223,27 @@ const TambahQuiz = () => {
                                 <form action="" method="post">
                                     <div className="row">
                                         <div className="col-lg-9 col-md-12 col-sm-12 ">
+                                            <Button
+                                                style={{
+                                                    backgroundColor: "#60C0BC",
+                                                    paddingRight: 10,
+                                                    paddingLeft: 10,
+                                                }}
+                                            >
+                                                Lanjutkan Pada Quiziz
+                                            </Button>
+                                            <p
+                                                style={{
+                                                    fontSize: 15,
+                                                    marginTop: 5,
+                                                    color: "GrayText",
+                                                }}
+                                            >
+                                                Klik tombol diatas untuk mengarahkan pada quiziz
+                                            </p>
                                             <div className="mb-3">
                                                 <label htmlFor="judulQuiz" className="form-label">
-                                                    Judul Quiz
+                                                    Link Quiz
                                                 </label>
                                                 <input
                                                     type="text"
@@ -210,88 +251,13 @@ const TambahQuiz = () => {
                                                     style={{
                                                         backgroundColor: "#f5f5f5",
                                                     }}
-                                                    id="judulQuiz"
-                                                    name="judulQuiz"
-                                                    placeholder="Masukkan judul quiz"
-                                                />
-                                                <p
-                                                    style={{
-                                                        fontSize: 15,
-                                                        marginTop: 5,
-                                                        color: "GrayText",
-                                                    }}
-                                                >
-                                                    Buat judul dengan spesifik sesuai dengan quiz yang
-                                                    dibuat
-                                                </p>
-                                            </div>
-                                            <div className="mb-3">
-                                                <label htmlFor="tagQuiz" className="form-label">
-                                                    Tag Quiz
-                                                </label>
-                                                <Select
-                                                    value={tags}
-                                                    onChange={handleChange}
-                                                    options={tagOptions}
-                                                    isMulti
-                                                    placeholder="Masukkan tag quiz"
-                                                    styles={customStyles}
+                                                    id="link"
+                                                    name="link"
+                                                    placeholder="Masukkan Link quiz"
                                                 />
                                             </div>
-                                            <div className="mb-3">
-                                                <label htmlFor="deskripsiQuiz" className="form-label">
-                                                    Jumlah Quiz
-                                                </label>
-                                                <input
-                                                    style={{
-                                                        backgroundColor: "#f5f5f5",
-                                                    }}
-                                                    className="form-control"
-                                                    id="deskripsiQuiz"
-                                                    name="deskripsiQuiz"
-                                                    rows="1"
-                                                    placeholder="Masukkan Jumlah Quiz"
-                                                ></input>
-                                            </div>
                                         </div>
-                                        <div className="col-lg-3  col-md-12 col-sm-12 text-center mt-4">
-                                            <Card
-                                                style={{
-                                                    backgroundColor: "#f5f5f5",
-                                                }}
-                                                onDragOver={handleDragOver}
-                                                onDrop={handleDrop}
-                                            >
-                                                <Card.Body>
-                                                    <Card.Title>Upload File</Card.Title>
-                                                    <Card.Text>
-                                                        <IoCloudUpload
-                                                            style={{ fontSize: "3rem", marginBottom: "1rem" }}
-                                                        />
-                                                        <p>Seret dan lepas di sini Atau</p>
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            onChange={handleFileInputChange}
-                                                            style={{ display: "none" }}
-                                                            id="fileInput"
-                                                        />
-                                                        <label htmlFor="fileInput">
-                                                            <Button
-                                                                className=""
-                                                                style={{
-                                                                    backgroundColor: "#60C0BC",
-                                                                }}
-                                                                as="span"
-                                                            >
-                                                                Pilih Gambar
-                                                            </Button>
-                                                        </label>
-                                                        {file && <p>File yang dipilih: {file.name}</p>}
-                                                    </Card.Text>
-                                                </Card.Body>
-                                            </Card>
-                                        </div>
+                                        <div className="col-lg-3  col-md-12 col-sm-12 text-center mt-4"></div>
                                     </div>
                                 </form>
                             </div>
@@ -301,14 +267,15 @@ const TambahQuiz = () => {
                                 <Button variant="btn btn-outline-success">Kembali</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button onClick={handleTambahQuizClick}
+                                <Button
+                                    onClick={handleSave}
                                     style={{
                                         backgroundColor: "#60C0BC",
                                         paddingRight: 10,
                                         paddingLeft: 10,
                                     }}
                                 >
-                                    Selanjutnya
+                                    Simpan
                                 </Button>
                             </Col>
                         </Row>
@@ -319,4 +286,4 @@ const TambahQuiz = () => {
     );
 };
 
-export default TambahQuiz;
+export default SaveQuiz;

@@ -24,4 +24,8 @@
     "nodemon": "^3.1.0",
     "prisma": "^5.10.2"
   }
+  ,
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  }
 }
