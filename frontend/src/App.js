@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter, Routes, Route} from 'react-router-dom';
 import QuizKreatif from './page/QuizKreatif';
 import TambahQuiz from './page/TambahQuiz';
-import SaveQuiz from './page/SaveQuiz';
 
 function App() {
   return (
@@ -11,7 +10,6 @@ function App() {
       <Routes>
         <Route path="/" element={<QuizKreatif/>}/>
         <Route path="/tambah-quiz" element={<TambahQuiz/>}/>
-        <Route path="/save-quiz" element={<SaveQuiz/>}/>
 
         {/* <Route path="/signup" element={<SignUp/>}/>
         <Route path="/dashboard" element={<Dashboard/>}/>

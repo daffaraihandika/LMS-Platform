@@ -76,7 +76,9 @@ export const createQuiz = async (req, res) => {
     });
 
     console.log("req body: berhasil");
-    console.log("new quiz: ", newQuiz);
+    console.log("req body: ", req.body);
+    console.log("req file: ", req.file);
+    console.log("quiz: ", newQuiz);
 
     return res.status(201).json({
       msg: "Berhasil membuat quiz baru",

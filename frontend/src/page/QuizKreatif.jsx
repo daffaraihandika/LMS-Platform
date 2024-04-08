@@ -1,5 +1,5 @@
 import { React, useEffect, useState } from "react";
-import { Navbar, Container, Nav, Image } from "react-bootstrap";
+import { Container, Image } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Dropdown from "react-bootstrap/Dropdown";
 import { GoReport } from "react-icons/go";
@@ -11,8 +11,8 @@ import { useNavigate } from "react-router-dom";
 import Badge from "react-bootstrap/Badge";
 import Stack from "react-bootstrap/Stack";
 import { IoIosNotificationsOutline } from "react-icons/io";
-import { FaRegEdit } from "react-icons/fa";
 import axios from "axios";
+import NavbarQuiz from "../components/NavbarQuiz";
 
 const QuizKreatif = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -43,29 +43,7 @@ const QuizKreatif = () => {
 
   return (
     <div>
-      <Navbar expand="lg" className="bg-body-tertiary mb-3">
-        <Container>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto">
-              <Nav.Link href="#home">
-                <Image
-                  src="https://3.bp.blogspot.com/-oa9m6Vjs78s/VMCqdcEo_lI/AAAAAAAAAqw/3GeZJLcpCYQ/s1600/IMG_0008.JPG"
-                  roundedCircle
-                  style={{ width: "30px", height: "30px" }}
-                />
-              </Nav.Link>
-              <Nav.Link href="#home">Raka</Nav.Link>
-              <Nav.Link href="#link">
-                <FaRegEdit />
-              </Nav.Link>
-              <Nav.Link href="#link">
-                <IoIosNotificationsOutline />
-              </Nav.Link>
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+      <NavbarQuiz />
 
       <Container>
         <Row>
@@ -154,7 +132,7 @@ const QuizKreatif = () => {
                       >
                         <div className="d-flex align-items-center">
                           <IoIosNotificationsOutline />
-                          <p className="mb-0" style={{fontSize: '13px'}}>{quiz.jumlahSoal} Qs</p>
+                          <p className="mb-0" style={{ fontSize: '13px' }}>{quiz.jumlahSoal} Qs</p>
                         </div>
                       </div>
                     </div>
