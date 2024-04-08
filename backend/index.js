@@ -7,7 +7,10 @@ import bodyParser from "body-parser";
 
 dotenv.config();
 const app = express();
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+app.use(cors({
+    credentials: true,
+    origin: ['http://localhost:3000', 'http://apps.local.edly.io:1996']
+}));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json())

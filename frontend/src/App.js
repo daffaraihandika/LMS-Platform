@@ -5,10 +5,12 @@ import TambahQuiz from './page/TambahQuiz';
 
 function App() {
   return (
+    <>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<QuizKreatif/>}/>
         <Route path="/tambah-quiz" element={<TambahQuiz/>}/>
+
         {/* <Route path="/signup" element={<SignUp/>}/>
         <Route path="/dashboard" element={<Dashboard/>}/>
         <Route path="/influencer-detail/:username" element={<StatistikInfluencer/>}/>
@@ -20,6 +22,7 @@ function App() {
         {/* <Route path="/search-influencer" element={<SearchByKeyword/>}/> */}
       </Routes>
     </BrowserRouter>
+    </>
   );
 }
 
