@@ -154,7 +154,7 @@ const QuizKreatif = () => {
                       >
                         <div className="d-flex align-items-center">
                           <IoIosNotificationsOutline />
-                          <p className="mb-0">{quiz.jumlahSoal} Qs</p>
+                          <p className="mb-0" style={{fontSize: '13px'}}>{quiz.jumlahSoal} Qs</p>
                         </div>
                       </div>
                     </div>
