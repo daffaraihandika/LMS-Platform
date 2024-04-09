@@ -16,6 +16,8 @@ import NavbarQuiz from "../components/NavbarQuiz";
 
 const QuizKreatif = () => {
   const [quizzes, setQuizzes] = useState([]);
+  const [tags, setTags] = useState([]);
+
   const navigate = useNavigate();
 
   const handleTambahQuizClick = () => {
@@ -26,7 +28,6 @@ const QuizKreatif = () => {
     try {
       const response = await axios.get("http://localhost:5000/quizzes");
       setQuizzes(response.data);
-      console.log(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -35,7 +36,7 @@ const QuizKreatif = () => {
   const getAllTag = async () => {
     try {
       const response = await axios.get("http://localhost:5000/tags");
-      console.log(response.data);
+      setTags(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -49,6 +50,20 @@ const QuizKreatif = () => {
   const buttonStyle = {
     backgroundColor: "#38B0AB",
     color: "#FFFFFF",
+  };
+
+  const handleDropdownItemClick = async (tag) => {
+    try {
+      let response;
+      if (tag === "Semua") {
+        response = await axios.get("http://localhost:5000/quizzes");
+      } else {
+        response = await axios.get(`http://localhost:5000/quizzes?tag=${tag.nameTag}`);
+      }
+      setQuizzes(response.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -74,13 +89,18 @@ const QuizKreatif = () => {
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu>
-                    <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">
-                      Another action
+                    <Dropdown.Item onClick={() => handleDropdownItemClick("Semua")}>
+                      Semua Kategori
                     </Dropdown.Item>
-                    <Dropdown.Item href="#/action-3">
-                      Something else
-                    </Dropdown.Item>
+                    <Dropdown.Divider />
+                    {tags.map((tag) => (
+                      <Dropdown.Item
+                        key={tag.id}
+                        onClick={() => handleDropdownItemClick(tag)}
+                      >
+                        {tag.nameTag}
+                      </Dropdown.Item>
+                    ))}
                   </Dropdown.Menu>
                 </Dropdown>
               </div>

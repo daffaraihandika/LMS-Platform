@@ -4,12 +4,37 @@ import cloudinary from "../config/cloudinaryConfig.js";
 const prisma = new PrismaClient();
 export const getQuiz = async (req, res) => {
   try {
-    const response = await prisma.Quiz.findMany({
-      include: {
-        user: true,
-        tags: true,
-      },
-    });
+    const { tag } = req.query;
+    let response;
+
+    if (tag) {
+      response = await prisma.Quiz.findMany({
+        where: {
+          tags: {
+            some: {
+              nameTag: tag,
+            },
+          },
+        },
+        orderBy: {
+          id: 'desc',
+        },
+        include: {
+          user: true,
+          tags: true,
+        },
+      });
+    } else {
+      response = await prisma.Quiz.findMany({
+        orderBy: {
+          id: 'desc', // Mengurutkan berdasarkan id secara descending
+        },
+        include: {
+          user: true,
+          tags: true,
+        },
+      });
+    }
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ msg: error.message });
