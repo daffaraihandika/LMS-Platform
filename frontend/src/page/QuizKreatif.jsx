@@ -34,7 +34,7 @@ const QuizKreatif = () => {
 
   useEffect(() => {
     getAllQuiz();
-  });
+  }, []);
 
   const buttonStyle = {
     backgroundColor: "#38B0AB",
