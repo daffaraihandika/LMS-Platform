@@ -32,8 +32,18 @@ const QuizKreatif = () => {
     }
   };
 
+  const getAllTag = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/tags");
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getAllQuiz();
+    getAllTag();
   }, []);
 
   const buttonStyle = {
@@ -60,7 +70,7 @@ const QuizKreatif = () => {
               <div>
                 <Dropdown>
                   <Dropdown.Toggle style={buttonStyle} id="dropdown-basic">
-                    Dropdown Button
+                    Kategori Quiz
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu>
