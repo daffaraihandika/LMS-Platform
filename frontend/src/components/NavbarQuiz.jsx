@@ -2,6 +2,9 @@ import React from "react";
 import { Navbar, Container, Nav, Image } from "react-bootstrap";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { FaRegEdit } from "react-icons/fa";
+import { Dropdown } from "react-bootstrap";
+import { IoNotificationsOutline } from "react-icons/io5";
+import { MdOutlineQuiz } from "react-icons/md";
 
 const NavbarQuiz = () => {
   return (
@@ -18,12 +21,29 @@ const NavbarQuiz = () => {
               />
             </Nav.Link>
             <Nav.Link href="#home">Raka</Nav.Link>
-            <Nav.Link href="#link">
-              <FaRegEdit />
-            </Nav.Link>
-            <Nav.Link href="#link">
-              <IoIosNotificationsOutline />
-            </Nav.Link>
+            <Dropdown>
+              <Dropdown.Toggle variant="none" id="dropdown-basic">
+                Profile Settings
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item href="#link">
+                  <FaRegEdit style={{ fontSize: "18px", color: "#38B0AB" }} />
+                  &nbsp;&nbsp;Edit
+                </Dropdown.Item>
+                <Dropdown.Item href="#link">
+                  <IoNotificationsOutline
+                    style={{ fontSize: "18px", color: "#38B0AB" }}
+                  />
+                  &nbsp;&nbsp;Notifikasi
+                </Dropdown.Item>
+                <Dropdown.Item href="#my-quiz">
+                  <MdOutlineQuiz
+                    style={{ fontSize: "18px", color: "#38B0AB" }}
+                  />
+                  &nbsp;&nbsp;My Quiz
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </Nav>
         </Navbar.Collapse>
       </Container>
