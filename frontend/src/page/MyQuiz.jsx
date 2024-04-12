@@ -3,7 +3,7 @@ import { React, useEffect, useState } from "react";
 import { Container, Image } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Dropdown from "react-bootstrap/Dropdown";
-import { GoReport, GoTrash } from "react-icons/go";
+import { GoTrash } from "react-icons/go";
 import { CiShare2 } from "react-icons/ci";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -15,6 +15,7 @@ import { IoIosNotificationsOutline } from "react-icons/io";
 import axios from "axios";
 import NavbarQuiz from "../components/NavbarQuiz";
 import Alert from "react-bootstrap/Alert";
+import { FaRegEdit } from "react-icons/fa";
 
 const MyQuiz = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -186,7 +187,7 @@ const MyQuiz = () => {
                       </Stack>
                     </div>
                     <div className="d-flex justify-content-between">
-                      <p className="mt-3" style={{ fontSize: "11px" }}>
+                      <p className="mt-3" style={{ fontSize: "12px" }}>
                         Dibuat tanggal
                         {new Date(quiz.createdAt).toLocaleDateString("id-ID", {
                           day: "numeric",
@@ -205,7 +206,19 @@ const MyQuiz = () => {
                           onClick={() => handleDelete(quiz.id)}
                         >
                           <GoTrash
-                            style={{ fontSize: "12px", color: "#FF0000" }}
+                            style={{ fontSize: "14px", color: "#FF0000" }}
+                          />
+                        </Button>
+                        <Button
+                          variant="outlined-secondary"
+                          size="sm"
+                          className="btn-sm"
+                          style={{
+                            fontSize: "9px",
+                          }}
+                        >
+                          <FaRegEdit
+                            style={{ fontSize: "14px", color: "#38B0AB" }}
                           />
                         </Button>
                         <Button
@@ -217,19 +230,7 @@ const MyQuiz = () => {
                           }}
                         >
                           <CiShare2
-                            style={{ fontSize: "12px", color: "#38B0AB" }}
-                          />
-                        </Button>
-                        <Button
-                          variant="outlined-secondary"
-                          size="sm"
-                          className="btn-sm"
-                          style={{
-                            fontSize: "9px",
-                          }}
-                        >
-                          <GoReport
-                            style={{ fontSize: "12px", color: "#38B0AB" }}
+                            style={{ fontSize: "14px", color: "#38B0AB" }}
                           />
                         </Button>
                       </div>
