@@ -18,6 +18,7 @@ import axios from "axios";
 import NavbarQuiz from "../components/NavbarQuiz";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const QuizKreatif = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -26,6 +27,7 @@ const QuizKreatif = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [link, setLink] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const handleTambahQuizClick = () => {
     navigate("/tambah-quiz");
@@ -34,6 +36,7 @@ const QuizKreatif = () => {
   const getAllQuiz = async () => {
     try {
       const response = await axios.get("http://localhost:5000/quizzes");
+      console.log(response.data)
       setQuizzes(response.data);
     } catch (error) {
       console.log(error);
@@ -57,6 +60,14 @@ const QuizKreatif = () => {
     // Handle the logic for saving the link here
     console.log("Link:", link);
     handleClose();
+    navigate(link);
+  };
+
+  const handleShareClick = () => {
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 1500); // Setelah 1.5 detik, atur status penyalinan kembali ke false
   };
 
   useEffect(() => {
@@ -275,11 +286,14 @@ const QuizKreatif = () => {
                             color: "#38B0AB",
                           }}
                         >
-                          <CiShare2
-                            style={{ fontSize: "12px", color: "#38B0AB" }}
-                          />
-                          Bagikan
+                          <CopyToClipboard text={quiz.link} onCopy={handleShareClick}>
+                            <div onClick={handleShareClick}>
+                              <CiShare2 style={{ fontSize: "12px", color: "#38B0AB" }} />
+                              Bagikan
+                            </div>
+                          </CopyToClipboard>
                         </Button>
+
                         <Button
                           variant="outlined-secondary"
                           size="sm"
