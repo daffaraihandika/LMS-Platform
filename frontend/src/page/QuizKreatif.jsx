@@ -13,10 +13,14 @@ import Stack from "react-bootstrap/Stack";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import axios from "axios";
 import NavbarQuiz from "../components/NavbarQuiz";
+import Modal from "react-bootstrap/Modal";
+import Form from "react-bootstrap/Form";
 
 const QuizKreatif = () => {
   const [quizzes, setQuizzes] = useState([]);
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [link, setLink] = useState("");
 
   const handleTambahQuizClick = () => {
     navigate("/tambah-quiz");
@@ -39,6 +43,16 @@ const QuizKreatif = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleClose = () => {
+    setShowModal(false);
+  };
+
+  const handleSaveChanges = () => {
+    // Handle the logic for saving the link here
+    console.log("Link:", link);
+    handleClose();
   };
 
   useEffect(() => {
@@ -66,6 +80,53 @@ const QuizKreatif = () => {
                 <Button style={buttonStyle} onClick={handleTambahQuizClick}>
                   Tambah Quiz
                 </Button>{" "}
+                <Button
+                  variant="outline-secondary"
+                  onClick={() => setShowModal(true)}
+                  style={{
+                    width: "150px",
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid #38B0AB",
+                    color: "#38B0AB",
+                  }}
+                >
+                  Join Quiz
+                </Button>{" "}
+                <Modal show={showModal} onHide={handleClose}>
+                  <Modal.Header closeButton>
+                    <Modal.Title>Masukkan Link</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <Form>
+                      <Form.Group className="mb-3" controlId="formBasicLink">
+                        <Form.Label>Link Quiz</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter link"
+                          value={link}
+                          onChange={(e) => setLink(e.target.value)}
+                          autoFocus
+                        />
+                      </Form.Group>
+                    </Form>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button
+                      variant="secondary"
+                      style={{
+                        backgroundColor: "#FFFFFF",
+                        border: "1px solid #38B0AB",
+                        color: "#38B0AB",
+                      }}
+                      onClick={handleClose}
+                    >
+                      Tutup
+                    </Button>
+                    <Button style={buttonStyle} onClick={handleSaveChanges}>
+                      Masuk Quiz
+                    </Button>
+                  </Modal.Footer>
+                </Modal>
               </div>
               <div>
                 <Dropdown>
@@ -142,7 +203,9 @@ const QuizKreatif = () => {
                       >
                         <div className="d-flex align-items-center">
                           <IoIosNotificationsOutline />
-                          <p className="mb-0" style={{ fontSize: '13px' }}>{quiz.jumlahSoal} Qs</p>
+                          <p className="mb-0" style={{ fontSize: "13px" }}>
+                            {quiz.jumlahSoal} Qs
+                          </p>
                         </div>
                       </div>
                     </div>
