@@ -1,15 +1,8 @@
 import { React, useEffect, useState } from "react";
-import { Container, Image } from "react-bootstrap";
-import Button from "react-bootstrap/Button";
-import Dropdown from "react-bootstrap/Dropdown";
+import { Container, Image, Button, Dropdown, Row, Col, Card, Badge, Stack } from "react-bootstrap";
 import { GoReport } from "react-icons/go";
 import { CiShare2 } from "react-icons/ci";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Card from "react-bootstrap/Card";
 import { useNavigate } from "react-router-dom";
-import Badge from "react-bootstrap/Badge";
-import Stack from "react-bootstrap/Stack";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import axios from "axios";
 import NavbarQuiz from "../components/NavbarQuiz";
