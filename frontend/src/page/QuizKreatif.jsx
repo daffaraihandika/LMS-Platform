@@ -1,5 +1,15 @@
 import { React, useEffect, useState } from "react";
-import { Container, Image, Button, Dropdown, Row, Col, Card, Badge, Stack } from "react-bootstrap";
+import {
+  Container,
+  Image,
+  Button,
+  Dropdown,
+  Row,
+  Col,
+  Card,
+  Badge,
+  Stack,
+} from "react-bootstrap";
 import { GoReport } from "react-icons/go";
 import { CiShare2 } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
@@ -65,7 +75,9 @@ const QuizKreatif = () => {
       if (tag === "Semua") {
         response = await axios.get("http://localhost:5000/quizzes");
       } else {
-        response = await axios.get(`http://localhost:5000/quizzes?tag=${tag.nameTag}`);
+        response = await axios.get(
+          `http://localhost:5000/quizzes?tag=${tag.nameTag}`
+        );
       }
       setQuizzes(response.data);
     } catch (error) {
@@ -143,7 +155,9 @@ const QuizKreatif = () => {
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu>
-                    <Dropdown.Item onClick={() => handleDropdownItemClick("Semua")}>
+                    <Dropdown.Item
+                      onClick={() => handleDropdownItemClick("Semua")}
+                    >
                       Semua Kategori
                     </Dropdown.Item>
                     <Dropdown.Divider />
