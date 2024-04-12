@@ -1,9 +1,5 @@
-import { React, useState } from "react";
-import { Container, Spinner } from "react-bootstrap";
-import Button from "react-bootstrap/Button";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Card from "react-bootstrap/Card";
+import { React, useState, useEffect } from "react";
+import { Container, Spinner, Button, Row, Col, Card, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import {
     FaCheck,
@@ -11,7 +7,6 @@ import {
 import {
     IoCloudUpload,
 } from "react-icons/io5";
-
 import axios from "axios";
 import Select from "react-select";
 import NavbarQuiz from "../components/NavbarQuiz";
@@ -27,13 +22,9 @@ const TambahQuiz = () => {
     const [showQuizizView, setShowQuizizView] = useState(false);
     const [selectedFileName, setSelectedFileName] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [tagOptions, setTagOptions] = useState([]);
+    const [errMsg, setErrMsg] = useState("");
     const navigate = useNavigate();
-
-    const tagOptions = [
-        { value: "tag1", label: "Tag 1" },
-        { value: "tag2", label: "Tag 2" },
-        { value: "tag3", label: "Tag 3" },
-    ];
 
     const customStyles = {
         multiValue: (styles) => ({
@@ -64,6 +55,15 @@ const TambahQuiz = () => {
         setTags(selectedOptions);
     };
 
+    const handleKeyDown = (event) => {
+        if (event.key === " " && event.target.value.trim() !== "") {
+            const newTag = { value: event.target.value.trim(), label: event.target.value.trim() };
+            setTags([...tags, newTag]);
+            event.target.value = "";
+            event.preventDefault();
+        }
+    };
+
     const handleFileInputChange = (event) => {
         const selectedFile = event.target.files[0];
         if (selectedFile) {
@@ -86,6 +86,16 @@ const TambahQuiz = () => {
         setSelectedFileName(droppedFile.name);
     };
 
+    const getAllTag = async () => {
+        try {
+            const response = await axios.get("http://localhost:5000/tags")
+            console.log(response)
+            setTagOptions(response.data.map(tag => ({ value: tag.nameTag, label: tag.nameTag })));
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     const handleSave = async () => {
         try {
             const formData = new FormData();
@@ -105,10 +115,16 @@ const TambahQuiz = () => {
             console.log("Data berhasil disimpan!!");
             navigate("/")
         } catch (error) {
-            console.error("Error saving quiz:", error);
+            console.error("Error saving quiz:", error.response.data.msg);
             setIsLoading(false);
+            setErrMsg(error.response.data.msg)
         }
     };
+
+    useEffect(() => {
+        getAllTag()
+    }, [])
+
 
     return (
         <div>
@@ -119,9 +135,7 @@ const TambahQuiz = () => {
                     <Row>
                         <Col>
                             <div className="title">
-                                <h1>
-                                    <b>Quiz Kreatif</b>
-                                </h1 >
+                                <h1>Quiz Kreatif</h1 >
                             </div >
                             <div className="header d-flex justify-content-between align-items-center">
                                 <div className="container mt-5 mx-5">
@@ -242,6 +256,7 @@ const TambahQuiz = () => {
                                                         isMulti
                                                         placeholder="Masukkan tag quiz"
                                                         styles={customStyles}
+                                                        onKeyDown={handleKeyDown}
                                                     />
                                                 </div>
                                                 <div className="mb-3">
@@ -442,6 +457,7 @@ const TambahQuiz = () => {
                                     </form>
                                 </div>
                             </Card>
+                            {errMsg && <Alert variant="danger" className="mt-3">{errMsg}</Alert>}
                             <Row className="justify-content-end mt-3 mb-4">
                                 <Col xs="auto" className="mr-2">
                                     <Button variant="btn btn-outline-success" onClick={handlePrevClick}>Kembali</Button>
