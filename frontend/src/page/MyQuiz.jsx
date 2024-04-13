@@ -8,7 +8,7 @@ import { CiShare2 } from "react-icons/ci";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useHistory } from "react-router-dom";
 import Badge from "react-bootstrap/Badge";
 import Stack from "react-bootstrap/Stack";
 import { IoIosNotificationsOutline } from "react-icons/io";
@@ -27,6 +27,7 @@ const MyQuiz = () => {
   const handleTambahQuizClick = () => {
     navigate("/tambah-quiz");
   };
+
 
   const getMyQuiz = async () => {
     try {
@@ -66,6 +67,10 @@ const MyQuiz = () => {
           console.error("Error deleting quiz:", error);
         });
     }
+  };
+
+  const handleEditQuiz = (quizId) => {
+    navigate(`/edit-quiz/${quizId}`);
   };
 
   useEffect(() => {
@@ -213,13 +218,10 @@ const MyQuiz = () => {
                           variant="outlined-secondary"
                           size="sm"
                           className="btn-sm"
-                          style={{
-                            fontSize: "9px",
-                          }}
+                          style={{ fontSize: "9px" }}
+                          onClick={() => handleEditQuiz(quiz.id)}
                         >
-                          <FaRegEdit
-                            style={{ fontSize: "14px", color: "#38B0AB" }}
-                          />
+                          <FaRegEdit style={{ fontSize: "14px", color: "#38B0AB" }} />
                         </Button>
                         <Button
                           variant="outlined-secondary"
