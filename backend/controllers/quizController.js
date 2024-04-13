@@ -128,10 +128,6 @@ export const createQuiz = async (req, res) => {
         tags: true,
       },
     });
-
-    console.log("req body: berhasil");
-    console.log("req body: ", req.body);
-    console.log("req file: ", req.file);
     console.log("quiz: ", newQuiz);
 
     return res.status(201).json({
@@ -239,14 +235,45 @@ export const deleteQuiz = async (req, res) => {
       return res.status(400).json({ msg: "ID quiz harus diisi" });
     }
 
+    // Menghapus quiz
     const deletedQuiz = await prisma.quiz.delete({
       where: {
         id: parseInt(id),
       },
-      select: {
-        title: true,
+      include: {
+        tags: true,
       },
     });
+
+    // Mengambil tag-tag yang terkait dengan quiz yang dihapus
+    const deletedQuizTags = deletedQuiz.tags.map(tag => tag.nameTag);
+
+    // Mengecek apakah ada quiz lain yang masih menggunakan tag yang terkait
+    const otherQuizzes = await prisma.quiz.findMany({
+      where: {
+        id: {
+          not: parseInt(id),
+        },
+        tags: {
+          some: {
+            nameTag: {
+              in: deletedQuizTags,
+            },
+          },
+        },
+      },
+    });
+
+    // Jika tidak ada quiz lain yang menggunakan tag tersebut, hapus tag dari database
+    const tagsToDelete = deletedQuizTags.filter(tag => !otherQuizzes.some(quiz => quiz.tags.some(qTag => qTag.nameTag === tag)));
+
+    await Promise.all(tagsToDelete.map(async (tagName) => {
+      await prisma.tag.deleteMany({
+        where: {
+          nameTag: tagName,
+        },
+      });
+    }));
 
     return res.status(200).json({
       msg: `Berhasil menghapus quiz ${deletedQuiz.title}`,
