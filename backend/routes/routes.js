@@ -8,7 +8,7 @@ import {
   deleteQuiz,
 } from "../controllers/quizController.js";
 
-import { getAllTags } from "../controllers/tagController.js";
+import { getAllTags, getTagsByUserId } from "../controllers/tagController.js";
 
 const router = express.Router();
 
@@ -23,5 +23,6 @@ router.get("/quizzes/user/:userId", getQuizByUser);
 router.delete("/quiz/:id", deleteQuiz);
 
 router.get("/tags", getAllTags);
+router.get("/tags/user/:userId", getTagsByUserId);
 
 export default router;
