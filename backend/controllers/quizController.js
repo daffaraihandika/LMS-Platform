@@ -7,6 +7,7 @@ export const getQuiz = async (req, res) => {
     const { tag } = req.query;
     let response;
 
+    // Jika tag ada, maka filter berdasarkan tag
     if (tag) {
       response = await prisma.Quiz.findMany({
         where: {
@@ -42,17 +43,45 @@ export const getQuiz = async (req, res) => {
 };
 
 export const getQuizByUser = async (req, res) => {
-  const userId = req.params.userId; // mengambil userId dari parameter
+  const userId = req.params.userId;
   try {
-    const response = await prisma.Quiz.findMany({
-      where: {
-        userId: Number(userId), // filter berdasarkan userId
-      },
-      include: {
-        tags: true,
-        user: true,
-      },
-    });
+    const { tag } = req.query;
+    let response;
+
+    // Jika tag ada, maka filter berdasarkan tag
+    if (tag) {
+      response = await prisma.Quiz.findMany({
+        where: {
+          userId: Number(userId),
+          tags: {
+            some: {
+              nameTag: tag,
+            },
+          },
+        },
+        orderBy: {
+          id: 'desc',
+        },
+        include: {
+          tags: true,
+          user: true,
+        },
+      });
+    } else {
+      response = await prisma.Quiz.findMany({
+        where: {
+          userId: Number(userId),
+        },
+        orderBy: {
+          id: 'desc',
+        },
+        include: {
+          tags: true,
+          user: true,
+        },
+      });
+    }
+
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ msg: error.message });
