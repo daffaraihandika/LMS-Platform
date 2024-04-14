@@ -1,28 +1,19 @@
 import { useParams } from "react-router-dom";
 import { React, useEffect, useState } from "react";
-import { Container, Image } from "react-bootstrap";
-import Button from "react-bootstrap/Button";
-import Dropdown from "react-bootstrap/Dropdown";
+import { Container, Image, Button, Dropdown, Row, Col, Card, Badge, Stack, Alert } from "react-bootstrap";
 import { GoTrash } from "react-icons/go";
 import { CiShare2 } from "react-icons/ci";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Card from "react-bootstrap/Card";
-import { useNavigate, useHistory } from "react-router-dom";
-import Badge from "react-bootstrap/Badge";
-import Stack from "react-bootstrap/Stack";
-import { IoIosNotificationsOutline } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import NavbarQuiz from "../components/NavbarQuiz";
-import Alert from "react-bootstrap/Alert";
 import { FaRegEdit } from "react-icons/fa";
 
 const MyQuiz = () => {
   const [quizzes, setQuizzes] = useState([]);
   const [deleteMessage, setDeleteMessage] = useState("");
+  const [tags, setTags] = useState([]);
   const navigate = useNavigate();
   const { userId } = useParams();
-  const { quizId } = useParams();
 
   const handleTambahQuizClick = () => {
     navigate("/tambah-quiz");
@@ -35,47 +26,56 @@ const MyQuiz = () => {
         `http://localhost:5000/quizzes/user/${userId}`
       );
       setQuizzes(response.data);
-      console.log(response.data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getAllTag = async () => {
+  const getAllTagByUserId = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/tags");
-      console.log(response.data);
+      const response = await axios.get(`http://localhost:5000/tags/user/${userId}`);
+      setTags(response.data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleDelete = (quizId) => {
+  const handleDelete = async (quizId) => {
     const confirmDelete = window.confirm(
       "Apakah kamu yakin akan menghapus quiz ini?"
     );
     if (confirmDelete) {
-      axios
-        .delete(`http://localhost:5000/quiz/${quizId}`)
-        .then((response) => {
-          const message = response.data.msg;
-          console.log(message);
-          setDeleteMessage(message);
-          navigate(`/my-quiz/${userId}`);
-        })
-        .catch((error) => {
-          console.error("Error deleting quiz:", error);
-        });
+      try {
+        const response = await axios.delete(`http://localhost:5000/quiz/${quizId}`)
+        const message = response.data.msg
+        setDeleteMessage(message)
+        await getMyQuiz();
+        navigate(`/my-quiz/${userId}`);
+      } catch (error) {
+        console.log(error)
+      }
     }
   };
 
-  const handleEditQuiz = (quizId) => {
-    navigate(`/edit-quiz/${quizId}`);
+  const handleDropdownItemClick = async (tag) => {
+    try {
+      let response;
+      if (tag === "Semua") {
+        response = await axios.get(`http://localhost:5000/quizzes/user/${userId}`);
+      } else {
+        response = await axios.get(
+          `http://localhost:5000/quizzes/user/${userId}?tag=${tag.nameTag}`
+        );
+      }
+      setQuizzes(response.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
     getMyQuiz();
-    getAllTag();
+    getAllTagByUserId();
   }, [userId]);
 
   useEffect(() => {
@@ -114,13 +114,20 @@ const MyQuiz = () => {
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu>
-                    <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">
-                      Another action
+                    <Dropdown.Item
+                      onClick={() => handleDropdownItemClick("Semua")}
+                    >
+                      Semua Kategori
                     </Dropdown.Item>
-                    <Dropdown.Item href="#/action-3">
-                      Something else
-                    </Dropdown.Item>
+                    <Dropdown.Divider />
+                    {tags.map((tag) => (
+                      <Dropdown.Item
+                        key={tag.id}
+                        onClick={() => handleDropdownItemClick(tag)}
+                      >
+                        {tag.nameTag}
+                      </Dropdown.Item>
+                    ))}
                   </Dropdown.Menu>
                 </Dropdown>
               </div>
@@ -132,7 +139,7 @@ const MyQuiz = () => {
           <Container className="h-screen d-flex align-items-center justify-content-center p-20">
             <Row className="w-100 bg-light rounded p-5 d-flex flex-wrap gap-5">
               {deleteMessage && (
-                <Alert key="danger" variant="danger">
+                <Alert key="danger" variant="danger" style={{ margin: '0' }}>
                   {deleteMessage}
                 </Alert>
               )}

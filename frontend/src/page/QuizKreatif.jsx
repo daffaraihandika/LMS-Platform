@@ -57,10 +57,12 @@ const QuizKreatif = () => {
   };
 
   const handleSaveChanges = () => {
-    // Handle the logic for saving the link here
-    console.log("Link:", link);
+    let formattedLink = link;
+    if (!formattedLink.startsWith("http://") && !formattedLink.startsWith("https://")) {
+      formattedLink = "http://" + formattedLink;
+    }
     handleClose();
-    navigate(link);
+    window.open(formattedLink, "_blank");
   };
 
   const handleShareClick = () => {
