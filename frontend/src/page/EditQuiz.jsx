@@ -85,7 +85,6 @@ const EditQuiz = () => {
   const getAllTag = async () => {
     try {
       const response = await axios.get('http://localhost:5000/tags');
-      console.log(response);
       setTagOptions(response.data.map((tag) => ({ value: tag.nameTag, label: tag.nameTag })));
     } catch (error) {
       console.log(error);
@@ -101,17 +100,13 @@ const EditQuiz = () => {
       formData.append('userId', userId);
       formData.append('image', file);
 
-      // Menambahkan tags ke formData
       tags.forEach((tag, index) => {
         formData.append(`tags[${index}][nameTag]`, tag.value);
       });
 
       const response = await axios.patch(`http://localhost:5000/edit-quiz/${quizId}`, formData);
-      console.log(response.data);
-      console.log('Data berhasil disimpan!!');
       navigate('/');
     } catch (error) {
-      console.error('Error saving quiz:', error.response.data.msg);
       setIsLoading(false);
       setErrMsg(error.response.data.msg);
     }
@@ -120,8 +115,8 @@ const EditQuiz = () => {
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/quiz/${quizId}`);
-        const { title, jumlahSoal, link, userId, tags } = response.data.data;
+        const response = await axios.get(`http://localhost:5000/quizzes/${quizId}`);
+        const { title, jumlahSoal, link, userId, tags } = response.data;
         setTitle(title);
         setJumlahSoal(jumlahSoal);
         setLink(link);
@@ -158,8 +153,7 @@ const EditQuiz = () => {
                     <hr
                       className="flex-grow-1"
                       style={{ borderTop: "2px solid transparent" }}
-                    />{" "}
-                    {/* Garis penghubung */}
+                    />
                     <div>
                       <h6 style={{ color: "#60C0BC" }}>
                         <b>Quiziz</b>
@@ -182,8 +176,7 @@ const EditQuiz = () => {
                     <hr
                       className="flex-grow-1"
                       style={{ borderTop: "2px solid #60C0BC" }}
-                    />{" "}
-                    {/* Garis penghubung */}
+                    />
                     <div>
                       <FaCheck
                         style={{
@@ -232,7 +225,7 @@ const EditQuiz = () => {
                             }}
                             id="judulQuiz"
                             name="judulQuiz"
-                            placeholder="Masukkan judul quiz"
+                            placeholder="Judul Quiz"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                           />
@@ -247,8 +240,8 @@ const EditQuiz = () => {
                           </p>
                         </div>
                         <div className="mb-3">
-                          <label htmlFor="tagQuiz" className="form-label">
-                            Tag Quiz
+                          <label htmlFor="tags" className="form-label">
+                            Tags
                           </label>
                           <Select
                             value={tags}
@@ -261,21 +254,21 @@ const EditQuiz = () => {
                           />
                         </div>
                         <div className="mb-3">
-                          <label htmlFor="deskripsiQuiz" className="form-label">
-                            Jumlah Quiz
+                          <label htmlFor="jumlahSoal" className="form-label">
+                            Jumlah Soal
                           </label>
                           <input
                             style={{
                               backgroundColor: "#f5f5f5",
                             }}
                             className="form-control"
-                            id="deskripsiQuiz"
-                            name="deskripsiQuiz"
+                            id="jumlahSoal"
+                            name="jumlahSoal"
                             rows="1"
-                            placeholder="Masukkan Jumlah Quiz"
+                            placeholder="Masukkan Jumlah Soal"
                             value={jumlahSoal}
                             onChange={(e) => setJumlahSoal(e.target.value)}
-                          ></input>
+                          />
                         </div>
                       </div>
                       <div className="col-lg-3  col-md-12 col-sm-12 text-center mt-4">
@@ -362,8 +355,7 @@ const EditQuiz = () => {
                     <hr
                       className="flex-grow-1"
                       style={{ borderTop: "2px solid transparent" }}
-                    />{" "}
-                    {/* Garis penghubung */}
+                    />
                     <div>
                       <h5 style={{ color: "#60C0BC" }}>
                         <b>Quiziz</b>
@@ -386,8 +378,7 @@ const EditQuiz = () => {
                     <hr
                       className="flex-grow-1"
                       style={{ borderTop: "2px solid #60C0BC" }}
-                    />{" "}
-                    {/* Garis penghubung */}
+                    />
                     <div>
                       <FaCheck
                         style={{
@@ -428,7 +419,7 @@ const EditQuiz = () => {
                           Klik tombol diatas untuk mengarahkan pada quiziz
                         </p>
                         <div className="mb-3">
-                          <label htmlFor="judulQuiz" className="form-label">
+                          <label htmlFor="linkQuiz" className="form-label">
                             Link Quiz
                           </label>
                           <input
@@ -437,44 +428,43 @@ const EditQuiz = () => {
                             style={{
                               backgroundColor: "#f5f5f5",
                             }}
-                            id="link"
-                            name="link"
-                            placeholder="Masukkan Link quiz"
+                            id="linkQuiz"
+                            name="linkQuiz"
+                            placeholder="Link Quiz"
                             value={link}
                             onChange={(e) => setLink(e.target.value)}
-                        />
+                          />
                         </div>
+                      </div>
+                      <div className="col-lg-3  col-md-12 col-sm-12 text-center mt-4"></div>
                     </div>
-                    <div className="col-lg-3  col-md-12 col-sm-12 text-center mt-4"></div>
-                    </div>
-                                    </form>
-                                </div>
-                            </Card>
-                            {errMsg && <Alert variant="danger" className="mt-3">{errMsg}</Alert>}
-                            <Row className="justify-content-end mt-3 mb-4">
-                                <Col xs="auto" className="mr-2">
-                                    <Button variant="btn btn-outline-success" onClick={handlePrevClick}>Kembali</Button>
-                                </Col>
-                                <Col xs="auto">
-                                    <Button
-                                        onClick={handleSave}
-                                        style={{
-                                            backgroundColor: "#60C0BC",
-                                            paddingRight: 10,
-                                            paddingLeft: 10,
-                                        }}
-                                    >
-                                        Simpan
-                                    </Button>
-                                </Col>
-                            </Row>
-                        </Col>
-                    </Row>
-                </Container>
-            )}
-
-        </div >
-    );
+                  </form>
+                </div>
+              </Card>
+              {errMsg && <Alert variant="danger" className="mt-3">{errMsg}</Alert>}
+              <Row className="justify-content-end mt-3 mb-4">
+                <Col xs="auto" className="mr-2">
+                  <Button variant="btn btn-outline-success" onClick={handlePrevClick}>Kembali</Button>
+                </Col>
+                <Col xs="auto">
+                  <Button
+                    onClick={handleSave}
+                    style={{
+                      backgroundColor: "#60C0BC",
+                      paddingRight: 10,
+                      paddingLeft: 10,
+                    }}
+                  >
+                    Simpan
+                  </Button>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </Container>
+      )}
+    </div>
+  );
 };
 
 export default EditQuiz;

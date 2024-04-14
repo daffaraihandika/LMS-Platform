@@ -19,6 +19,9 @@ const MyQuiz = () => {
     navigate("/tambah-quiz");
   };
 
+  const handleEditQuiz = (quizId) => {
+    navigate(`/edit-quiz/${quizId}`);
+  };
 
   const getMyQuiz = async () => {
     try {
