@@ -25,7 +25,8 @@ const QuizKreatif = () => {
   const [tags, setTags] = useState([]);
 
   const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false); //modal untuk button join quiz
+  const [modalShow, setModalShow] = useState(false); //modal untuk button laporkan
   const [link, setLink] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -306,12 +307,97 @@ const QuizKreatif = () => {
                             fontSize: "10px",
                             color: "#38B0AB",
                           }}
+                          onClick={() => setModalShow(true)}
                         >
                           <GoReport
                             style={{ fontSize: "12px", color: "#38B0AB" }}
                           />
                           Laporkan
                         </Button>
+                        <Modal
+                          show={modalShow}
+                          onHide={() => setModalShow(false)}
+                          size="md"
+                          aria-labelledby="contained-modal-title-vcenter"
+                          centered
+                          backdrop="static"
+                        >
+                          <Modal.Header closeButton>
+                            <Modal.Title id="contained-modal-title-vcenter">
+                              <b>Laporkan Quiz</b>
+                            </Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>
+                            <h5 className="mb-4">
+                              <b>Apa jenis masalah yang anda laporkan ? </b>
+                            </h5>
+                            <div>
+                              <Container className="h-screen d-flex align-items-center justify-content-center p-10">
+                                <Row className="w-100 bg-light rounded p-3 d-flex flex-wrap gap-4 border">
+                                  <Row className="d-flex align-items-center justify-content-start">
+                                    <Col className="d-flex align-items-center col-10">
+                                      <span>
+                                        <b>Plagiat</b>
+                                        <br />
+                                        Quiz atau pertanyaan dalam quiz
+                                        merupakan plagiat dari sumber lain tanpa
+                                        izin atau atribusi yang tepat
+                                      </span>
+                                    </Col>
+                                    <Col className="d-flex justify-content-end">
+                                      <Form.Check
+                                        type="radio"
+                                        name="formHorizontalRadios"
+                                        id="formHorizontalRadios1"
+                                      />
+                                    </Col>
+                                  </Row>
+                                  <Row className="d-flex align-items-center justify-content-start">
+                                    <Col className="d-flex align-items-center col-10">
+                                      <span>
+                                        <b>Privasi</b>
+                                        <br />
+                                        Membagikan informasi pribadi, mengancam
+                                        akan membagikan/menyebarkan informasi
+                                        pribadi
+                                      </span>
+                                    </Col>
+                                    <Col className="d-flex justify-content-end">
+                                      <Form.Check
+                                        type="radio"
+                                        name="formHorizontalRadios"
+                                        id="formHorizontalRadios1"
+                                      />
+                                    </Col>
+                                  </Row>
+                                  <Row className="d-flex align-items-center justify-content-start">
+                                    <Col className="d-flex align-items-center col-10">
+                                      <span>
+                                        <b>
+                                          Penghinaan & Pelecehan secara Online
+                                        </b>
+                                        <br />
+                                        Penghinaan, konten seksual yang tidak
+                                        diinginkan, konten NSFW & grafis yang
+                                        tidak diinginkan, pelecehan bertarget
+                                      </span>
+                                    </Col>
+                                    <Col className="d-flex justify-content-end">
+                                      <Form.Check
+                                        type="radio"
+                                        name="formHorizontalRadios"
+                                        id="formHorizontalRadios1"
+                                      />
+                                    </Col>
+                                  </Row>
+                                </Row>
+                              </Container>
+                            </div>
+                          </Modal.Body>
+                          <Modal.Footer>
+                            <Button style={buttonStyle}>Laporkan</Button>
+                          </Modal.Footer>
+                        </Modal>
                       </div>
                     </div>
                   </Card.Body>

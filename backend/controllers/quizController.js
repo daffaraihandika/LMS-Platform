@@ -88,6 +88,36 @@ export const getQuizByUser = async (req, res) => {
   }
 };
 
+export const getQuizById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ msg: "ID quiz harus diisi" });
+    }
+
+    const quiz = await prisma.quiz.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+      include: {
+        user: true,
+        tags: true,
+      },
+    });
+
+    if (!quiz) {
+      return res.status(404).json({ msg: "Quiz tidak ditemukan" });
+    }
+
+    res.status(200).json(quiz);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Terjadi kesalahan saat mengambil quiz" });
+  }
+};
+
+
 export const createQuiz = async (req, res) => {
   try {
     const { title, jumlahSoal, link, userId, tags } = req.body;

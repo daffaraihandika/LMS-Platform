@@ -19,6 +19,10 @@ const MyQuiz = () => {
     navigate("/tambah-quiz");
   };
 
+  const handleEditQuiz = (quizId) => {
+    navigate(`/edit-quiz/${quizId}`);
+  };
+
   const getMyQuiz = async () => {
     try {
       const response = await axios.get(
@@ -224,13 +228,10 @@ const MyQuiz = () => {
                           variant="outlined-secondary"
                           size="sm"
                           className="btn-sm"
-                          style={{
-                            fontSize: "9px",
-                          }}
+                          style={{ fontSize: "9px" }}
+                          onClick={() => handleEditQuiz(quiz.id)}
                         >
-                          <FaRegEdit
-                            style={{ fontSize: "14px", color: "#38B0AB" }}
-                          />
+                          <FaRegEdit style={{ fontSize: "14px", color: "#38B0AB" }} />
                         </Button>
                         <Button
                           variant="outlined-secondary"
