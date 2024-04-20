@@ -177,13 +177,13 @@ const QuizKreatif = () => {
                       Mulai Quiz
                     </button>
                     <div className="flex">
-                      <button className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500  border border-teal-500 rounded mr-2">
+                      <button className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500   rounded mr-2">
                         <CiShare2 className="" />
                         <p className="text-[9px]">Bagikan</p>
                       </button>
                       <button
                         onClick={() => setModalShow(true)}
-                        className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
+                        className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500  rounded"
                       >
                         <GoReport className="" />
                         <p className="text-[9px]">Laporkan</p>
