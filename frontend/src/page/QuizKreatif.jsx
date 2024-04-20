@@ -1,33 +1,21 @@
-import { React, useEffect, useState } from "react";
-import {
-  Container,
-  Image,
-  Button,
-  Dropdown,
-  Row,
-  Col,
-  Card,
-  Badge,
-  Stack,
-} from "react-bootstrap";
-import { GoReport } from "react-icons/go";
-import { CiShare2 } from "react-icons/ci";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IoIosNotificationsOutline } from "react-icons/io";
 import axios from "axios";
+import { IoIosNotificationsOutline } from "react-icons/io";
+import { CiShare2 } from "react-icons/ci";
+import { GoReport } from "react-icons/go";
+import { MdFormatListBulleted } from "react-icons/md";
+import { TbCategory } from "react-icons/tb";
 import NavbarQuiz from "../components/NavbarQuiz";
-import Modal from "react-bootstrap/Modal";
-import Form from "react-bootstrap/Form";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const QuizKreatif = () => {
   const [quizzes, setQuizzes] = useState([]);
   const [tags, setTags] = useState([]);
-
-  const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false); //modal untuk button join quiz
-  const [modalShow, setModalShow] = useState(false); //modal untuk button laporkan
+  const [showModal, setShowModal] = useState(false);
+  const [modalShow, setModalShow] = useState(false);
   const [link, setLink] = useState("");
+  const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
 
   const handleTambahQuizClick = () => {
@@ -36,8 +24,9 @@ const QuizKreatif = () => {
 
   const getAllQuiz = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/quizzes");
-      console.log(response.data)
+      const response = await axios.get(
+        "http://194.233.93.124:3030/quiz/quizzes"
+      );
       setQuizzes(response.data);
     } catch (error) {
       console.log(error);
@@ -46,7 +35,7 @@ const QuizKreatif = () => {
 
   const getAllTag = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/tags");
+      const response = await axios.get("http://194.233.93.124:3030/quiz/tags");
       setTags(response.data);
     } catch (error) {
       console.log(error);
@@ -78,156 +67,98 @@ const QuizKreatif = () => {
     getAllTag();
   }, []);
 
-  const buttonStyle = {
-    backgroundColor: "#38B0AB",
-    color: "#FFFFFF",
-  };
-
-  const handleDropdownItemClick = async (tag) => {
-    try {
-      let response;
-      if (tag === "Semua") {
-        response = await axios.get("http://localhost:5000/quizzes");
-      } else {
-        response = await axios.get(
-          `http://localhost:5000/quizzes?tag=${tag.nameTag}`
-        );
-      }
-      setQuizzes(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   return (
     <div>
-      <NavbarQuiz />
-
-      <Container>
-        <Row>
-          <Col>
-            <div className="title">
-              <h1>Quiz Kreatif</h1>
+      <div className="block">
+        {showModal && (
+          <div className="fixed inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 bg-gray-900 opacity-50"></div>
+            <div className="bg-white p-8 rounded max-w-sm">
+              <button onClick={handleClose}>&times;</button>
+              <input
+                type="text"
+                value={link}
+                onChange={(e) => setLink(e.target.value)}
+                className="border rounded py-2 px-3 w-full my-2"
+                placeholder="Enter link"
+              />
+              <button
+                onClick={handleSaveChanges}
+                className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Masuk Quiz
+              </button>
             </div>
-            <div className="header d-flex justify-content-between align-items-center mb-3">
+          </div>
+        )}
+      </div>
+      <div className="container mx-auto p-8">
+        <div className="mb-4">
+          <div className="flex justify-between mb-3 flex-col">
+            <div>
+              <p className="text-3xl font-semibold mb-8">Quiz Kreatif</p>
+            </div>
+            <div className="flex justify-between">
               <div>
-                <Button style={buttonStyle} onClick={handleTambahQuizClick}>
+                <button
+                  onClick={handleTambahQuizClick}
+                  className="bg-teal-500 hover:bg-teal-700 text-white text-sm py-2 px-6 rounded mr-2"
+                >
                   Tambah Quiz
-                </Button>{" "}
-                <Button
-                  variant="outline-secondary"
+                </button>
+                <button
                   onClick={() => setShowModal(true)}
-                  style={{
-                    width: "150px",
-                    backgroundColor: "#FFFFFF",
-                    border: "1px solid #38B0AB",
-                    color: "#38B0AB",
-                  }}
+                  className="bg-white hover:bg-gray-100 text-teal-500 text-sm py-2 px-12 border border-teal-500 rounded"
                 >
                   Join Quiz
-                </Button>{" "}
-                <Modal show={showModal} onHide={handleClose}>
-                  <Modal.Header closeButton>
-                    <Modal.Title>Masukkan Link</Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body>
-                    <Form>
-                      <Form.Group className="mb-3" controlId="formBasicLink">
-                        <Form.Label>Link Quiz</Form.Label>
-                        <Form.Control
-                          type="text"
-                          placeholder="Enter link"
-                          value={link}
-                          onChange={(e) => setLink(e.target.value)}
-                          autoFocus
-                        />
-                      </Form.Group>
-                    </Form>
-                  </Modal.Body>
-                  <Modal.Footer>
-                    <Button
-                      variant="secondary"
-                      style={{
-                        backgroundColor: "#FFFFFF",
-                        border: "1px solid #38B0AB",
-                        color: "#38B0AB",
-                      }}
-                      onClick={handleClose}
-                    >
-                      Tutup
-                    </Button>
-                    <Button style={buttonStyle} onClick={handleSaveChanges}>
-                      Masuk Quiz
-                    </Button>
-                  </Modal.Footer>
-                </Modal>
+                </button>
               </div>
-              <div>
-                <Dropdown>
-                  <Dropdown.Toggle style={buttonStyle} id="dropdown-basic">
-                    Kategori Quiz
-                  </Dropdown.Toggle>
 
-                  <Dropdown.Menu>
-                    <Dropdown.Item
-                      onClick={() => handleDropdownItemClick("Semua")}
-                    >
-                      Semua Kategori
-                    </Dropdown.Item>
-                    <Dropdown.Divider />
-                    {tags.map((tag) => (
-                      <Dropdown.Item
-                        key={tag.id}
-                        onClick={() => handleDropdownItemClick(tag)}
-                      >
-                        {tag.nameTag}
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Menu>
-                </Dropdown>
+              <div className="relative inline-block text-left flex items-center">
+                <TbCategory className="mr-3 text-teal-400 text-2xl mb-5" />
+                <button
+                  type="button"
+                  className="text-sm bg-white text-gray-500 border border-gray-300 py-2 pr-56 pl-3 rounded-lg mb-4 text-left inline-flex items-center"
+                >
+                  Kategori Quiz
+                </button>
               </div>
             </div>
-          </Col>
-        </Row>
-
-        <div className="mb-4">
-          <Container className="h-screen d-flex align-items-center justify-content-center p-20">
-            <Row className="w-100 bg-light rounded p-5 d-flex flex-wrap gap-5">
+          </div>
+          <div className="container bg-slate-50 mx-auto p-6 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {quizzes.map((quiz) => (
-                <Card key={quiz.id} style={{ width: "22rem" }}>
+                <div
+                  key={quiz.id}
+                  className="max-w-sm rounded-lg overflow-hidden shadow-lg p-5 bg-white"
+                >
+                  <div className="font-semibold text-xl mb-4">{quiz.title}</div>
                   {quiz.image && (
-                    <div
-                      className="d-flex justify-content-center align-items-center mt-3"
-                      style={{ height: "170px" }}
-                    >
-                      <Card.Img
+                    <div>
+                      <img
+                        className="object-cover w-96 h-48 rounded"
                         src={quiz.image}
-                        style={{
-                          width: "300px",
-                          height: "170px",
-                          objectFit: "cover",
-                        }}
+                        alt={quiz.title}
                       />
                     </div>
                   )}
-                  <Card.Body>
-                    <Card.Title>{quiz.title}</Card.Title>
-                    <div className="d-flex align-items-center mb-4">
-                      <Image
+
+                  <div className="flex items-center mt-5 gap-3">
+                    <div className="flex h-full items-center">
+                      <img
+                        className="h-10 w-10 rounded-full"
                         src="https://3.bp.blogspot.com/-oa9m6Vjs78s/VMCqdcEo_lI/AAAAAAAAAqw/3GeZJLcpCYQ/s1600/IMG_0008.JPG"
-                        roundedCircle
-                        style={{
-                          width: "30px",
-                          height: "30px",
-                          marginRight: "10px",
-                        }}
                       />
-                      <div>
-                        <p className="mb-0 mt-3" style={{ fontSize: "16px" }}>
-                          {quiz.user.name}
-                        </p>
-                        <p className="mb-0" style={{ fontSize: "11px" }}>
-                          Dibuat tanggal
+                    </div>
+                    <div className="flex w-full justify-between mt-2 mb-2">
+                      <div className="flex-col">
+                        <div>
+                          <span className="text-sm text-gray-950">
+                            Anya Felissa
+                          </span>
+                        </div>
+                        <p className="text-gray-400 text-xs">
+                          Dibuat tanggal{" "}
                           {new Date(quiz.createdAt).toLocaleDateString(
                             "id-ID",
                             {
@@ -238,175 +169,98 @@ const QuizKreatif = () => {
                           )}
                         </p>
                       </div>
-                      <div
-                        className="ml-auto d-flex align-items-center"
-                        style={{ marginLeft: "60px" }}
-                      >
-                        <div className="d-flex align-items-center">
-                          <IoIosNotificationsOutline />
-                          <p className="mb-0" style={{ fontSize: "13px" }}>
-                            {quiz.jumlahSoal} Qs
-                          </p>
-                        </div>
+                      <div className="flex items-center px-3 gap-2">
+                        <MdFormatListBulleted className="text-orange-400" />
+                        <p>10 Qs</p>
                       </div>
                     </div>
-                    <div className="d-flex justify-content-start mb-4">
-                      <Stack direction="horizontal" gap={2}>
-                        {quiz.tags.map((tag) => (
-                          <Badge
-                            key={tag.id}
-                            style={{
-                              backgroundColor: "#F9A682",
-                              color: "#B23E19",
-                            }}
-                            bg="none"
-                          >
-                            {tag.nameTag}
-                          </Badge>
-                        ))}
-                      </Stack>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <Button
-                        style={{
-                          backgroundColor: "#38B0AB",
-                          color: "#FFFFFF",
-                          width: "150px",
-                        }}
-                        className="btn-sm"
+                  </div>
+                  <div className="mt-5">
+                    {quiz.tags.map((tag) => (
+                      <span
+                        key={tag.id}
+                        className="inline-block bg-orange-300 rounded-md px-3 py-1 text-xs text-red-600 mr-2"
                       >
-                        Mulai Quiz
-                      </Button>
-                      <div className="d-flex">
-                        <Button
-                          variant="outlined-secondary"
-                          size="sm"
-                          className="me-2 btn-sm"
-                          style={{
-                            width: "60px",
-                            height: "auto",
-                            fontSize: "10px",
-                            color: "#38B0AB",
-                          }}
-                        >
-                          <CopyToClipboard text={quiz.link} onCopy={handleShareClick}>
-                            <div onClick={handleShareClick}>
-                              <CiShare2 style={{ fontSize: "12px", color: "#38B0AB" }} />
-                              Bagikan
-                            </div>
-                          </CopyToClipboard>
-                        </Button>
-
-                        <Button
-                          variant="outlined-secondary"
-                          size="sm"
-                          className="btn-sm"
-                          style={{
-                            width: "60px",
-                            height: "auto",
-                            fontSize: "10px",
-                            color: "#38B0AB",
-                          }}
-                          onClick={() => setModalShow(true)}
-                        >
-                          <GoReport
-                            style={{ fontSize: "12px", color: "#38B0AB" }}
-                          />
-                          Laporkan
-                        </Button>
-                        <Modal
-                          show={modalShow}
-                          onHide={() => setModalShow(false)}
-                          size="md"
-                          aria-labelledby="contained-modal-title-vcenter"
-                          centered
-                          backdrop="static"
-                        >
-                          <Modal.Header closeButton>
-                            <Modal.Title id="contained-modal-title-vcenter">
-                              <b>Laporkan Quiz</b>
-                            </Modal.Title>
-                          </Modal.Header>
-                          <Modal.Body>
-                            <h5 className="mb-4">
-                              <b>Apa jenis masalah yang anda laporkan ? </b>
-                            </h5>
+                        {tag.nama_tag}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-5 flex gap-2 justify-between w-full">
+                    <button className="bg-teal-500 hover:bg-teal-700 text-white font-base text-md py-1 px-14 rounded">
+                      Mulai Quiz
+                    </button>
+                    <div className="flex">
+                      <button className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500  border border-teal-500 rounded mr-2">
+                        {/* <CiShare2 className="" />
+                        <p className="text-[9px]">Bagikan</p> */}
+                        <CopyToClipboard text={quiz.link} onCopy={handleShareClick}>
+                          <div onClick={handleShareClick} className="flex flex-col items-center justify-center">
+                            <CiShare2 className=""/>
+                            <p className="text-[9px] m-0">Bagikan</p>
+                          </div>
+                        </CopyToClipboard>
+                      </button>
+                      <button
+                        onClick={() => setModalShow(true)}
+                        className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
+                      >
+                        <GoReport className="" />
+                        <p className="text-[9px]">Laporkan</p>
+                      </button>
+                      {modalShow && (
+                        <div className="fixed inset-0 flex items-center justify-center">
+                          <div className="absolute inset-0 bg-gray-900 opacity-50"></div>
+                          <div className="bg-white p-8 rounded max-w-sm">
+                            <button onClick={() => setModalShow(false)}>
+                              &times;
+                            </button>
                             <div>
-                              <Container className="h-screen d-flex align-items-center justify-content-center p-10">
-                                <Row className="w-100 bg-light rounded p-3 d-flex flex-wrap gap-4 border">
-                                  <Row className="d-flex align-items-center justify-content-start">
-                                    <Col className="d-flex align-items-center col-10">
-                                      <span>
-                                        <b>Plagiat</b>
-                                        <br />
-                                        Quiz atau pertanyaan dalam quiz
-                                        merupakan plagiat dari sumber lain tanpa
-                                        izin atau atribusi yang tepat
-                                      </span>
-                                    </Col>
-                                    <Col className="d-flex justify-content-end">
-                                      <Form.Check
-                                        type="radio"
-                                        name="formHorizontalRadios"
-                                        id="formHorizontalRadios1"
-                                      />
-                                    </Col>
-                                  </Row>
-                                  <Row className="d-flex align-items-center justify-content-start">
-                                    <Col className="d-flex align-items-center col-10">
-                                      <span>
-                                        <b>Privasi</b>
-                                        <br />
-                                        Membagikan informasi pribadi, mengancam
-                                        akan membagikan/menyebarkan informasi
-                                        pribadi
-                                      </span>
-                                    </Col>
-                                    <Col className="d-flex justify-content-end">
-                                      <Form.Check
-                                        type="radio"
-                                        name="formHorizontalRadios"
-                                        id="formHorizontalRadios1"
-                                      />
-                                    </Col>
-                                  </Row>
-                                  <Row className="d-flex align-items-center justify-content-start">
-                                    <Col className="d-flex align-items-center col-10">
-                                      <span>
-                                        <b>
-                                          Penghinaan & Pelecehan secara Online
-                                        </b>
-                                        <br />
-                                        Penghinaan, konten seksual yang tidak
-                                        diinginkan, konten NSFW & grafis yang
-                                        tidak diinginkan, pelecehan bertarget
-                                      </span>
-                                    </Col>
-                                    <Col className="d-flex justify-content-end">
-                                      <Form.Check
-                                        type="radio"
-                                        name="formHorizontalRadios"
-                                        id="formHorizontalRadios1"
-                                      />
-                                    </Col>
-                                  </Row>
-                                </Row>
-                              </Container>
+                              <h5 className="mb-4 font-bold">
+                                Apa jenis masalah yang anda laporkan?
+                              </h5>
+                              <div className="flex flex-col">
+                                <label className="inline-flex items-center">
+                                  <input
+                                    type="radio"
+                                    className="form-radio"
+                                    name="reportType"
+                                  />
+                                  <span className="ml-2">Plagiat</span>
+                                </label>
+                                <label className="inline-flex items-center">
+                                  <input
+                                    type="radio"
+                                    className="form-radio"
+                                    name="reportType"
+                                  />
+                                  <span className="ml-2">Privasi</span>
+                                </label>
+                                <label className="inline-flex items-center">
+                                  <input
+                                    type="radio"
+                                    className="form-radio"
+                                    name="reportType"
+                                  />
+                                  <span className="ml-2">
+                                    Penghinaan & Pelecehan secara Online
+                                  </span>
+                                </label>
+                              </div>
                             </div>
-                          </Modal.Body>
-                          <Modal.Footer>
-                            <Button style={buttonStyle}>Laporkan</Button>
-                          </Modal.Footer>
-                        </Modal>
-                      </div>
+                            <button className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded mt-4">
+                              Laporkan
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </Card.Body>
-                </Card>
+                  </div>
+                </div>
               ))}
-            </Row>
-          </Container>
+            </div>
+          </div>
         </div>
-      </Container>
+      </div>
     </div>
   );
 };
