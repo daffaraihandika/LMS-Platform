@@ -23,8 +23,8 @@ const TambahQuiz = () => {
     useEffect(() => {
         const getAllTag = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/tags");
-                setTagOptions(response.data.map(tag => ({ value: tag.nameTag, label: tag.nameTag })));
+                const response = await axios.get("http://194.233.93.124:3030/quiz/tags");
+                setTagOptions(response.data.map(tag => ({ value: tag.nama_tag, label: tag.nama_tag })));
             } catch (error) {
                 console.error('Error fetching tags:', error);
             }
@@ -61,14 +61,15 @@ const TambahQuiz = () => {
         formData.append('userId', userId);
         formData.append('file', file);
         tags.forEach((tag, index) => {
-            formData.append(`tags[${index}][nameTag]`, tag.value);
+            formData.append(`tags[${index}][nama_tag]`, tag.value);
         });
 
         try {
-            const response = await axios.post('http://localhost:5000/new-quiz', formData);
+            const response = await axios.post('http://194.233.93.124:3030/quiz/new-quiz', formData);
             console.log(response.data);
             navigate('/');
         } catch (error) {
+            console.log(error)
             setErrMsg(error.response?.data?.msg || "An error occurred");
             setIsLoading(false);
         }
@@ -144,15 +145,48 @@ const TambahQuiz = () => {
                 ) : (
                     <>
                         <div>
-                            {isLoading && <div className="flex justify-center items-center">
-                                <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full" role="status">
-                                    <span className="visually-hidden">Loading...</span>
+                            <div className="text-center">
+                                <h1 className="text-3xl font-bold">Quiz Kreatif</h1>
+                            </div>
+                            <div className="mt-4">
+                                {isLoading && (
+                                    <div className="flex justify-center items-center">
+                                        <div className="spinner animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                                    </div>
+                                )}
+                                <div className="flex justify-center items-center my-4">
+                                    <div className="mx-2">
+                                        <FaCheck className="text-4xl text-green-500" />
+                                    </div>
+                                    <div className="mx-2">
+                                        <FaCheck className="text-4xl text-blue-500" />
+                                    </div>
                                 </div>
-                            </div>}
-                            {errMsg && <div className="text-red-500 text-xs italic mt-4">{errMsg}</div>}
-                            <button onClick={handleSave} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                Save
-                            </button>
+                                <div className="mx-auto p-4">
+                                    <label htmlFor="link" className="block text-gray-700 text-sm font-bold mb-2">
+                                        Link Quiz
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="link"
+                                        value={link}
+                                        onChange={e => setLink(e.target.value)}
+                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    />
+                                    <a href="https://quizizz.com/admin?modal=contentCreation&type=quiz&ctaSource=quizmaker-main&fromPage=quizmaker&lng=en" target="_blank" className="block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 text-center">
+                                        Lanjutkan Pada Quiziz
+                                    </a>
+                                </div>
+                                {errMsg && <div className="text-red-500 text-xs italic mt-4">{errMsg}</div>}
+                                <div className="flex justify-end space-x-4 mt-4">
+                                    <button onClick={handlePrevClick} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                        Kembali
+                                    </button>
+                                    <button onClick={handleSave} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                        Simpan
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </>
                 )}
