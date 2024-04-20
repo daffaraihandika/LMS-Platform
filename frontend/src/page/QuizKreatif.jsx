@@ -7,6 +7,7 @@ import { GoReport } from "react-icons/go";
 import { MdFormatListBulleted } from "react-icons/md";
 import { TbCategory } from "react-icons/tb";
 import NavbarQuiz from "../components/NavbarQuiz";
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const QuizKreatif = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -15,6 +16,7 @@ const QuizKreatif = () => {
   const [modalShow, setModalShow] = useState(false);
   const [link, setLink] = useState("");
   const navigate = useNavigate();
+  const [copied, setCopied] = useState(false);
 
   const handleTambahQuizClick = () => {
     navigate("/tambah-quiz");
@@ -45,8 +47,19 @@ const QuizKreatif = () => {
   };
 
   const handleSaveChanges = () => {
-    console.log("Link:", link);
+    let formattedLink = link;
+    if (!formattedLink.startsWith("http://") && !formattedLink.startsWith("https://")) {
+      formattedLink = "http://" + formattedLink;
+    }
     handleClose();
+    window.open(formattedLink, "_blank");
+  };
+
+  const handleShareClick = () => {
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 1500); // Setelah 1.5 detik, atur status penyalinan kembali ke false
   };
 
   useEffect(() => {

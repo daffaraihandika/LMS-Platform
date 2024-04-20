@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import QuizKreatif from "./page/QuizKreatif";
 import TambahQuiz from "./page/TambahQuiz";
 import MyQuiz from "./page/MyQuiz";
+import EditQuiz from "./page/EditQuiz";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<QuizKreatif />} />
           <Route path="/tambah-quiz" element={<TambahQuiz />} />
           <Route path="/my-quiz/:userId" element={<MyQuiz />} />
+          <Route path="/edit-quiz/:quizId" element={<EditQuiz />} />
 
           {/* <Route path="/signup" element={<SignUp/>}/>
         <Route path="/dashboard" element={<Dashboard/>}/>
