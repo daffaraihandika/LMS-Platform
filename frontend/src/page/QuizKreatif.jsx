@@ -191,8 +191,14 @@ const QuizKreatif = () => {
                     </button>
                     <div className="flex">
                       <button className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500  border border-teal-500 rounded mr-2">
-                        <CiShare2 className="" />
-                        <p className="text-[9px]">Bagikan</p>
+                        {/* <CiShare2 className="" />
+                        <p className="text-[9px]">Bagikan</p> */}
+                        <CopyToClipboard text={quiz.link} onCopy={handleShareClick}>
+                          <div onClick={handleShareClick} className="flex flex-col items-center justify-center">
+                            <CiShare2 className=""/>
+                            <p className="text-[9px] m-0">Bagikan</p>
+                          </div>
+                        </CopyToClipboard>
                       </button>
                       <button
                         onClick={() => setModalShow(true)}
