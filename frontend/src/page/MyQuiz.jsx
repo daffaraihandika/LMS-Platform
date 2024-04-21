@@ -3,7 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { CiShare2 } from "react-icons/ci";
-import { GoReport } from "react-icons/go";
+import { FaRegEdit } from "react-icons/fa";
+import { MdPeople } from "react-icons/md";
+import { MdDeleteOutline } from "react-icons/md";
 import { MdFormatListBulleted } from "react-icons/md";
 import { TbCategory } from "react-icons/tb";
 import NavbarQuiz from "../components/NavbarQuiz";
@@ -160,17 +162,6 @@ const MyQuiz = () => {
                             Anya Felissa
                           </span>
                         </div>
-                        <p className="text-gray-400 text-xs">
-                          Dibuat tanggal{" "}
-                          {new Date(quiz.createdAt).toLocaleDateString(
-                            "id-ID",
-                            {
-                              day: "numeric",
-                              month: "long",
-                              year: "numeric",
-                            }
-                          )}
-                        </p>
                       </div>
                       <div className="flex items-center px-3 gap-2">
                         <MdFormatListBulleted className="text-orange-400" />
@@ -188,76 +179,51 @@ const MyQuiz = () => {
                       </span>
                     ))}
                   </div>
-                  <div className="mt-5 flex gap-2 justify-between w-full">
-                    <button className="bg-teal-500 hover:bg-teal-700 text-white font-base text-md py-1 px-14 rounded">
-                      Mulai Quiz
-                    </button>
-                    <div className="flex">
-                      <button className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500  border border-teal-500 rounded mr-2">
-                        {/* <CiShare2 className="" />
-                        <p className="text-[9px]">Bagikan</p> */}
-                        <CopyToClipboard text={quiz.link} onCopy={handleShareClick}>
-                          <div onClick={handleShareClick} className="flex flex-col items-center justify-center">
-                            <CiShare2 className=""/>
-                            <p className="text-[9px] m-0">Bagikan</p>
-                          </div>
-                        </CopyToClipboard>
-                      </button>
-                      <button
-                        onClick={() => setModalShow(true)}
-                        className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
-                      >
-                        <GoReport className="" />
-                        <p className="text-[9px]">Laporkan</p>
-                      </button>
-                      {modalShow && (
-                        <div className="fixed inset-0 flex items-center justify-center">
-                          <div className="absolute inset-0 bg-gray-900 opacity-50"></div>
-                          <div className="bg-white p-8 rounded max-w-sm">
-                            <button onClick={() => setModalShow(false)}>
-                              &times;
-                            </button>
-                            <div>
-                              <h5 className="mb-4 font-bold">
-                                Apa jenis masalah yang anda laporkan?
-                              </h5>
-                              <div className="flex flex-col">
-                                <label className="inline-flex items-center">
-                                  <input
-                                    type="radio"
-                                    className="form-radio"
-                                    name="reportType"
-                                  />
-                                  <span className="ml-2">Plagiat</span>
-                                </label>
-                                <label className="inline-flex items-center">
-                                  <input
-                                    type="radio"
-                                    className="form-radio"
-                                    name="reportType"
-                                  />
-                                  <span className="ml-2">Privasi</span>
-                                </label>
-                                <label className="inline-flex items-center">
-                                  <input
-                                    type="radio"
-                                    className="form-radio"
-                                    name="reportType"
-                                  />
-                                  <span className="ml-2">
-                                    Penghinaan & Pelecehan secara Online
-                                  </span>
-                                </label>
-                              </div>
-                            </div>
-                            <button className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded mt-4">
-                              Laporkan
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                  <div className="mt-5 flex justify-between items-start w-full">
+                  <div className="border border-gray-200 rounded p-4"> {/* Tambahkan border, padding, dan rounded corners */}
+                      <p className="text-black-400 text-xs flex items-center">
+                        <MdPeople className="mr-2 text-xl" />
+                        5 Orang selesai
+                      </p>
+                      <p className="text-black-400 text-xs">
+                        Dibuat tanggal{" "}
+                        {new Date(quiz.createdAt).toLocaleDateString(
+                          "id-ID", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          }
+                        )}
+                      </p>
                     </div>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => setModalShow(true)}
+                      className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
+                    >
+                      <MdDeleteOutline className="" />
+                      <p className="text-[5px]"></p>
+                    </button>
+                    <button
+                      onClick={() => setModalShow(true)}
+                      className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
+                    >
+                      <FaRegEdit className="" />
+                      <p className="text-[5px]"></p>
+                    </button>
+                    <button
+                      onClick={() => setModalShow(true)}
+                      className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded mr-2"
+                    >
+                      <CopyToClipboard text={quiz.link} onCopy={handleShareClick}>
+                        <div onClick={handleShareClick} className="flex flex-col items-center justify-center">
+                          <CiShare2 className=""/>
+                          <p className="text-[5px] m-0"></p>
+                        </div>
+                      </CopyToClipboard>
+                    </button>
                   </div>
+                </div>
                 </div>
               ))}
             </div>
