@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Spinner, Button, Row, Col, Card, Alert } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FaCheck } from 'react-icons/fa';
-import { IoCloudUpload } from 'react-icons/io5';
 import axios from 'axios';
 import Select from 'react-select';
 import NavbarQuiz from '../components/NavbarQuiz';
+import { FaCheck } from 'react-icons/fa';
+import { IoCloudUpload } from 'react-icons/io5';
+ 
 
 const EditQuiz = () => {
   const { quizId } = useParams();
@@ -84,8 +84,8 @@ const EditQuiz = () => {
 
   const getAllTag = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/tags');
-      setTagOptions(response.data.map((tag) => ({ value: tag.nameTag, label: tag.nameTag })));
+      const response = await axios.get("http://194.233.93.124:3030/quiz/tags");
+      setTags(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -104,7 +104,7 @@ const EditQuiz = () => {
         formData.append(`tags[${index}][nameTag]`, tag.value);
       });
 
-      const response = await axios.patch(`http://localhost:5000/edit-quiz/${quizId}`, formData);
+      const response = await axios.patch(`http://194.233.93.124:3030/quiz/edit-quiz/${quizId}`, formData);
       navigate('/');
     } catch (error) {
       setIsLoading(false);
@@ -115,7 +115,7 @@ const EditQuiz = () => {
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/quizzes/${quizId}`);
+        const response = await axios.get(`http://194.233.93.124:3030/quiz/quizzes/${quizId}`);
         const { title, jumlahSoal, link, userId, tags } = response.data;
         setTitle(title);
         setJumlahSoal(jumlahSoal);
@@ -131,340 +131,172 @@ const EditQuiz = () => {
     getAllTag();
   }, [quizId]);
 
-  return (
-    <div>
-      <NavbarQuiz />
-
-      {!showQuizizView ? (
-        <Container>
-          <Row>
-            <Col>
-              <div className="title">
-                <h1>Quiz Kreatif</h1>
-              </div>
-              <div className="header d-flex justify-content-between align-items-center">
-                <div className="container mt-5 mx-5">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <h5 style={{ color: "#60C0BC" }}>
-                        <b> Quiz Info</b>
-                      </h5>
+    return (
+        <div>
+            {/* <NavbarQuiz /> */}
+            <div style={{ fontSize: '24px', fontWeight: 'bold', marginLeft: '20px', marginTop: '20px' }}>
+                <h2>Quiz Kreatif</h2>
+            </div>    
+            <div className="container mx-auto p-8">
+                {!showQuizizView ? (
+                    <>
+                    <div style={{marginLeft: '20px', marginBottom: '30px', marginRight:'20px' }}>
+                        <ol class="flex items-center w-full text-sm font-medium text-center text-gray-500 dark:text-gray-400 sm:text-base">
+                            <li class="flex md:w-full items-center text-blue-600 dark:text-blue-500 sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700">
+                                <span class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
+                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+                                    </svg>
+                                    Data <span class="hidden sm:inline-flex sm:ms-2">Quiz</span>
+                                </span>
+                            </li>
+                            <li class="flex items-center">
+                                <span class="me-2">2</span>
+                                Link <span class="hidden sm:inline-flex sm:ms-2">Quiziz</span>
+                            </li>
+                        </ol>
                     </div>
-                    <hr
-                      className="flex-grow-1"
-                      style={{ borderTop: "2px solid transparent" }}
-                    />
-                    <div>
-                      <h6 style={{ color: "#60C0BC" }}>
-                        <b>Quiziz</b>
-                      </h6>
-                    </div>
-                  </div>
-
-                  <div className="d-flex justify-content-between align-items-center mx-2">
-                    <div>
-                      <FaCheck
-                        style={{
-                          border: "2px solid #60C0BC",
-                          borderRadius: "50%",
-                          fontSize: 25,
-                          color: "#28a745",
-                          padding: 5,
-                        }}
-                      />
-                    </div>
-                    <hr
-                      className="flex-grow-1"
-                      style={{ borderTop: "2px solid #60C0BC" }}
-                    />
-                    <div>
-                      <FaCheck
-                        style={{
-                          border: "2px solid #60C0BC",
-                          borderRadius: "50%",
-                          fontSize: 25,
-                          color: "#60C0BC",
-                          padding: 5,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <Card className="mt-3">
-                <div className="container mt-5">
-                  <form action="" method="post">
-                    <div className="row">
-                      <div className="col-lg-9 col-md-12 col-sm-12 ">
-                        <div className="mb-3">
-                          <label htmlFor="userId" className="form-label">
-                            ID User
-                          </label>
-                          <input
-                            type="text"
-                            className="form-control fill-input"
-                            style={{
-                              backgroundColor: "#f5f5f5",
-                            }}
-                            id="userId"
-                            name="userId"
-                            placeholder="User Id"
-                            value={userId}
-                            onChange={(e) => setUserId(e.target.value)}
-                          />
+                        <div className="mb-6">
+                            <label htmlFor="title" className="block text-gray-700 text-sm font-bold mb-2">
+                                Title
+                            </label>
+                            <input
+                                type="text"
+                                id="title"
+                                value={title}
+                                onChange={e => setTitle(e.target.value)}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            />
                         </div>
-                        <div className="mb-3">
-                          <label htmlFor="judulQuiz" className="form-label">
-                            Judul Quiz
-                          </label>
-                          <input
-                            type="text"
-                            className="form-control fill-input"
-                            style={{
-                              backgroundColor: "#f5f5f5",
-                            }}
-                            id="judulQuiz"
-                            name="judulQuiz"
-                            placeholder="Judul Quiz"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                          />
-                          <p
-                            style={{
-                              fontSize: 15,
-                              marginTop: 5,
-                              color: "GrayText",
-                            }}
-                          >
-                            Buat judul dengan spesifik sesuai dengan quiz yang dibuat
-                          </p>
+                        <div className="mb-6">
+                            <label htmlFor="userId" className="block text-gray-700 text-sm font-bold mb-2">
+                                User ID
+                            </label>
+                            <input
+                                type="text"
+                                id="userId"
+                                value={userId}
+                                onChange={e => setUserId(e.target.value)}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            />
                         </div>
-                        <div className="mb-3">
-                          <label htmlFor="tags" className="form-label">
-                            Tags
-                          </label>
-                          <Select
-                            value={tags}
-                            onChange={handleTagChange}
-                            options={tagOptions}
-                            isMulti
-                            placeholder="Masukkan tag quiz"
-                            styles={customStyles}
-                            onKeyDown={handleKeyDown}
-                          />
+                        <div className="mb-6">
+                            <label htmlFor="tags" className="block text-gray-700 text-sm font-bold mb-2">
+                                Tags
+                            </label>
+                            <Select
+                                id="tags"
+                                value={tags}
+                                onChange={handleTagChange}
+                                options={tagOptions}
+                                isMulti
+                                className="basic-multi-select"
+                                classNamePrefix="select"
+                            />
                         </div>
-                        <div className="mb-3">
-                          <label htmlFor="jumlahSoal" className="form-label">
-                            Jumlah Soal
-                          </label>
-                          <input
-                            style={{
-                              backgroundColor: "#f5f5f5",
-                            }}
-                            className="form-control"
-                            id="jumlahSoal"
-                            name="jumlahSoal"
-                            rows="1"
-                            placeholder="Masukkan Jumlah Soal"
-                            value={jumlahSoal}
-                            onChange={(e) => setJumlahSoal(e.target.value)}
-                          />
+                        <div className="mb-6">
+                            <label htmlFor="userId" className="block text-gray-700 text-sm font-bold mb-2">
+                                Jumlah Quiz
+                            </label>
+                            <input
+                                type="text"
+                                id="userId"
+                                value={jumlahSoal}
+                                onChange={e => setJumlahSoal(e.target.value)}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            />
                         </div>
-                      </div>
-                      <div className="col-lg-3  col-md-12 col-sm-12 text-center mt-4">
-                        <Card
-                          style={{
-                            backgroundColor: "#f5f5f5",
-                          }}
-                          onDragOver={handleDragOver}
-                          onDrop={handleDrop}
-                        >
-                          <Card.Body>
-                            <Card.Title>Upload File</Card.Title>
-                            <Card.Text>
-                              <IoCloudUpload style={{ fontSize: "3rem", marginBottom: "1rem" }} />
-                              <p>Seret dan lepas di sini Atau</p>
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileInputChange}
-                                style={{ display: "none" }}
-                                id="fileInput"
-                              />
-                              <label htmlFor="fileInput">
-                                <Button
-                                  className=""
-                                  style={{ backgroundColor: "#60C0BC" }}
-                                  as="span"
-                                >
-                                  Pilih Gambar
-                                </Button>
-                              </label>
-
-                              {selectedFileName && (
-                                <p style={{ marginTop: "10px" }}>File yang dipilih: {selectedFileName}</p>
-                              )}
-                            </Card.Text>
-                          </Card.Body>
-                        </Card>
-                      </div>
-                    </div>
-                  </form>
-                </div>
-              </Card>
-              <Row className="justify-content-end mt-3 mb-4">
-                <Col xs="auto" className="mr-2">
-                  <Button variant="btn btn-outline-success" onClick={handleBackClick}>
-                    Kembali
-                  </Button>
-                </Col>
-                <Col xs="auto">
-                  <Button
-                    onClick={handleNextClick}
-                    style={{
-                      backgroundColor: "#60C0BC",
-                      paddingRight: 10,
-                      paddingLeft: 10,
-                    }}
-                  >
-                    Selanjutnya
-                  </Button>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </Container>
-      ) : (
-        <Container>
-          <Row>
-            <Col>
-              <div className="title">
-                <h1>
-                  <b>Quiz Kreatif</b>
-                </h1>
-              </div>
-              <div className="mx-auto">{isLoading && <Spinner animation="border" />}</div>
-              <div className="header d-flex justify-content-between align-items-center">
-                <div className="container mt-5 mx-5">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <h6 style={{ color: "#60C0BC" }}>
-                        <b> Quiz Info</b>
-                      </h6>
-                    </div>
-                    <hr
-                      className="flex-grow-1"
-                      style={{ borderTop: "2px solid transparent" }}
-                    />
-                    <div>
-                      <h5 style={{ color: "#60C0BC" }}>
-                        <b>Quiziz</b>
-                      </h5>
-                    </div>
-                  </div>
-
-                  <div className="d-flex justify-content-between align-items-center mx-2">
-                    <div>
-                      <FaCheck
-                        style={{
-                          border: "2px solid #60C0BC",
-                          borderRadius: "50%",
-                          fontSize: 25,
-                          color: "#60C0BC",
-                          padding: 5,
-                        }}
-                      />
-                    </div>
-                    <hr
-                      className="flex-grow-1"
-                      style={{ borderTop: "2px solid #60C0BC" }}
-                    />
-                    <div>
-                      <FaCheck
-                        style={{
-                          border: "2px solid #60C0BC",
-                          borderRadius: "50%",
-                          fontSize: 25,
-                          color: "#28a745",
-                          padding: 5,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <Card className="mt-3">
-                <div className="container mt-5">
-                  <form action="" method="post">
-                    <div className="row">
-                      <div className="col-lg-9 col-md-12 col-sm-12 ">
-                        <a href="https://quizizz.com/admin?modal=contentCreation&type=quiz&ctaSource=quizmaker-main&fromPage=quizmaker&lng=en" target="_blank">
-                          <Button
-                            style={{
-                              backgroundColor: "#60C0BC",
-                              paddingRight: 10,
-                              paddingLeft: 10,
-                            }}
-                          >
-                            Lanjutkan Pada Quiziz
-                          </Button>
-                        </a>
-                        <p
-                          style={{
-                            fontSize: 15,
-                            marginTop: 5,
-                            color: "GrayText",
-                          }}
-                        >
-                          Klik tombol diatas untuk mengarahkan pada quiziz
-                        </p>
-                        <div className="mb-3">
-                          <label htmlFor="linkQuiz" className="form-label">
-                            Link Quiz
-                          </label>
-                          <input
-                            type="text"
-                            className="form-control fill-input"
-                            style={{
-                              backgroundColor: "#f5f5f5",
-                            }}
-                            id="linkQuiz"
-                            name="linkQuiz"
-                            placeholder="Link Quiz"
-                            value={link}
-                            onChange={(e) => setLink(e.target.value)}
-                          />
+                        <div className="mb-6">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">
+                                File Upload
+                            </label>
+                            <div className="flex items-center">
+                                <IoCloudUpload className="text-3xl text-gray-400" />
+                                <input
+                                    type="file"
+                                    onChange={handleFileInputChange}
+                                    className="ml-4"
+                                />
+                            </div>
+                            {selectedFileName && <div className="mt-2 text-sm text-gray-600">Selected file: {selectedFileName}</div>}
                         </div>
-                      </div>
-                      <div className="col-lg-3  col-md-12 col-sm-12 text-center mt-4"></div>
+                            <div className="flex justify-end gap-4">
+                            <button
+                                onClick={handlePrevClick}
+                                className="bg-white text-gray-700 hover:bg-gray-200 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            >
+                                Kembali
+                            </button>
+                            <button
+                                onClick={handleNextClick}
+                                className="bg-green-300 hover:bg-green-400 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            >
+                                Selanjutnya
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                    <div style={{marginLeft: '20px', marginBottom: '20px', marginRight:'20px' }}>
+                    <ol class="flex items-center w-full text-sm font-medium text-center text-gray-500 dark:text-gray-400 sm:text-base">
+                        <li class="flex md:w-full items-center text-gray-500 dark:text-gray-400 sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700">
+                        <span class="me-2">1</span>
+                            Data <span class="hidden sm:inline-flex sm:ms-2">Quiz</span>
+                        </li>
+                        <li class="flex items-center text-blue-600 dark:text-blue-500">
+                        <span class="me-2">
+                            <svg class="w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                            Link <span class="hidden sm:inline-flex sm:ms-2">Quiziz</span>
+                        </li>
+                    </ol>
                     </div>
-                  </form>
-                </div>
-              </Card>
-              {errMsg && <Alert variant="danger" className="mt-3">{errMsg}</Alert>}
-              <Row className="justify-content-end mt-3 mb-4">
-                <Col xs="auto" className="mr-2">
-                  <Button variant="btn btn-outline-success" onClick={handlePrevClick}>Kembali</Button>
-                </Col>
-                <Col xs="auto">
-                  <Button
-                    onClick={handleSave}
-                    style={{
-                      backgroundColor: "#60C0BC",
-                      paddingRight: 10,
-                      paddingLeft: 10,
-                    }}
-                  >
-                    Simpan
-                  </Button>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </Container>
-      )}
-    </div>
-  );
+                        <div>
+                            <div className="mt-4">
+                                {isLoading && (
+                                    <div className="flex justify-center items-center">
+                                        <div className="spinner animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                                    </div>
+                                )}
+                                <div className="mx-auto p-4">
+                                <a href="https://quizizz.com/admin?modal=contentCreation&type=quiz&ctaSource=quizmaker-main&fromPage=quizmaker&lng=en" target="_blank" class="block hover:bg-4CAEA3 text-white font-bold py-2 px-4 rounded mt-4 text-center" style={{ backgroundColor: '#38B0AB', width: '20vw', marginTop:'20px', marginBottom:'20px' }}>
+                                    Lanjutkan Pada Quiziz
+                                </a>
+                                    <label htmlFor="link" className="block text-gray-700 text-sm font-bold mb-2">
+                                        Link Quiz
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="link"
+                                        value={link}
+                                        onChange={e => setLink(e.target.value)}
+                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    />
+                                </div>
+                                {errMsg && <div className="text-red-500 text-xs italic mt-4">{errMsg}</div>}
+                                <div className="flex justify-end gap-4">
+                                    <button
+                                        onClick={handlePrevClick}
+                                        className="bg-white text-gray-700 hover:bg-gray-200 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                    >
+                                        Kembali
+                                    </button>
+                                    <button
+                                        onClick={handleSave}
+                                        className="bg-green-300 hover:bg-green-400 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                    >
+                                        Edit
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    );
 };
 
 export default EditQuiz;
