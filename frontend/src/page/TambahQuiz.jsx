@@ -59,7 +59,7 @@ const TambahQuiz = () => {
         formData.append('jumlahSoal', jumlahSoal);
         formData.append('link', link);
         formData.append('userId', userId);
-        formData.append('file', file);
+        formData.append('image', file);
         tags.forEach((tag, index) => {
             formData.append(`tags[${index}][nama_tag]`, tag.value);
         });
@@ -117,6 +117,18 @@ const TambahQuiz = () => {
                                 isMulti
                                 className="basic-multi-select"
                                 classNamePrefix="select"
+                            />
+                        </div>
+                        <div className="mb-6">
+                            <label htmlFor="userId" className="block text-gray-700 text-sm font-bold mb-2">
+                                Jumlah Quiz
+                            </label>
+                            <input
+                                type="text"
+                                id="userId"
+                                value={jumlahSoal}
+                                onChange={e => setJumlahSoal(e.target.value)}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             />
                         </div>
                         <div className="mb-6">
