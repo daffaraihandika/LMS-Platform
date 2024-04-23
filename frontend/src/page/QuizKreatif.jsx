@@ -62,6 +62,10 @@ const QuizKreatif = () => {
     }, 1500); // Setelah 1.5 detik, atur status penyalinan kembali ke false
   };
 
+  const handleRadioChange = (event) => {
+    setSelectedReason(event.target.value);
+  };
+
   useEffect(() => {
     getAllQuiz();
     getAllTag();
@@ -69,6 +73,7 @@ const QuizKreatif = () => {
 
   return (
     <div>
+      <NavbarQuiz />
       <div className="block">
         {showModal && (
           <div className="fixed inset-0 flex items-center justify-center">
@@ -191,8 +196,6 @@ const QuizKreatif = () => {
                     </button>
                     <div className="flex">
                       <button className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500  border border-teal-500 rounded mr-2">
-                        {/* <CiShare2 className="" />
-                        <p className="text-[9px]">Bagikan</p> */}
                         <CopyToClipboard text={quiz.link} onCopy={handleShareClick}>
                           <div onClick={handleShareClick} className="flex flex-col items-center justify-center">
                             <CiShare2 className=""/>
