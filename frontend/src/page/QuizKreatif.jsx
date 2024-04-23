@@ -6,7 +6,7 @@ import { CiShare2 } from "react-icons/ci";
 import { GoReport } from "react-icons/go";
 import { MdFormatListBulleted } from "react-icons/md";
 import { TbCategory } from "react-icons/tb";
-import NavbarQuiz from "../components/NavbarQuiz";
+// import NavbarQuiz from "../components/NavbarQuiz";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const QuizKreatif = () => {
@@ -67,6 +67,21 @@ const QuizKreatif = () => {
     setSelectedReason(event.target.value);
   };
 
+  const handleDropdownChange = async (event) => {
+    let tag = event.target.value;
+    try {
+      let response;
+      if (tag === "Semua") {
+        response = await axios.get("http://194.233.93.124:3030/quiz/quizzes");
+      } else {
+        response = await axios.get(`http://194.233.93.124:3030/quiz/quizzes?tag=${tag}`);
+      }
+      setQuizzes(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getAllQuiz();
     getAllTag();
@@ -74,7 +89,7 @@ const QuizKreatif = () => {
 
   return (
     <div>
-      <NavbarQuiz />
+      {/* <NavbarQuiz /> */}
       <div className="container mx-auto p-8">
         <div className="mb-4">
           <div className="flex justify-between mb-3 flex-col">
@@ -137,10 +152,15 @@ const QuizKreatif = () => {
 
               <div className="relative inline-block text-left flex items-center">
                 <TbCategory className="mr-3 text-teal-400 text-2xl mb-5" />
-                <select className="text-sm bg-white text-gray-500 border border-gray-300 py-2 pr-48 pl-3 rounded-lg mb-4 text-left inline-flex items-center appearance-none">
-                  <option>Semua Kategori Quiz</option>
+                <select
+                  onChange={handleDropdownChange}
+                  className="text-sm bg-white text-gray-500 border border-gray-300 py-2 pr-10 pl-3 rounded-lg mb-4 text-left inline-flex items-center appearance-none"
+                >
+                  <option value="Semua">Semua Kategori Quiz</option>
                   {tags.map((tag) => (
-                    <option key={tag.id}>{tag.nama_tag}</option>
+                    <option key={tag.id} value={tag.nama_tag}>
+                      {tag.nama_tag}
+                    </option>
                   ))}
                 </select>
                 <div className="absolute right-2 transform -translate-y-1/2 pointer-events-none">
@@ -336,8 +356,8 @@ const QuizKreatif = () => {
                                 <button
                                   disabled={!selectedReason}
                                   className={`${selectedReason
-                                      ? "bg-teal-500 hover:bg-teal-700"
-                                      : "bg-gray-300 cursor-not-allowed"
+                                    ? "bg-teal-500 hover:bg-teal-700"
+                                    : "bg-gray-300 cursor-not-allowed"
                                     } text-white text-sm py-2 px-4 rounded-md mt-4`}
                                 >
                                   Laporkan
