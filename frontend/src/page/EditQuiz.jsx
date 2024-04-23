@@ -8,128 +8,91 @@ import { IoCloudUpload } from 'react-icons/io5';
  
 
 const EditQuiz = () => {
-  const { quizId } = useParams();
-  const [title, setTitle] = useState('');
-  const [jumlahSoal, setJumlahSoal] = useState('');
-  const [link, setLink] = useState('');
-  const [userId, setUserId] = useState('');
-  const [tags, setTags] = useState([]);
-  const [file, setFile] = useState(null);
-  const [showQuizizView, setShowQuizizView] = useState(false);
-  const [selectedFileName, setSelectedFileName] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [tagOptions, setTagOptions] = useState([]);
-  const [errMsg, setErrMsg] = useState('');
-  const navigate = useNavigate();
+    const [title, setTitle] = useState('');
+    const [jumlahSoal, setJumlahSoal] = useState('');
+    const [link, setLink] = useState('');
+    const [userId, setUserId] = useState('');
+    const [tags, setTags] = useState([]);
+    const [file, setFile] = useState(null);
+    const [showQuizizView, setShowQuizizView] = useState(false);
+    const [selectedFileName, setSelectedFileName] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [tagOptions, setTagOptions] = useState([]);
+    const [errMsg, setErrMsg] = useState('');
+    const navigate = useNavigate();
+    const { quizId } = useParams();
 
-  const customStyles = {
-    multiValue: (styles) => ({
-      ...styles,
-      backgroundColor: 'orange',
-    }),
-    multiValueLabel: (styles) => ({
-      ...styles,
-      color: 'white',
-    }),
-  };
+    useEffect(() => {
+        const getAllTag = async () => {
+            try {
+                const response = await axios.get("http://194.233.93.124:3030/quiz/tags");
+                setTagOptions(response.data.map(tag => ({ value: tag.nama_tag, label: tag.nama_tag })));
+            } catch (error) {
+                console.error('Error fetching tags:', error);
+            }
+        };
+        getAllTag();
 
-  const handleNextClick = () => {
-    setIsLoading(false);
-    setShowQuizizView(true);
-  };
+        const fetchQuizData = async () => {
+            try {
+                const response = await axios.get(`http://194.233.93.124:3030/quiz/quizzes/${quizId}`);
+                const { title, jumlahSoal, link, userId, tags } = response.data;
+                setTitle(title);
+                setJumlahSoal(jumlahSoal);
+                setLink(link);
+                setUserId(userId);
+                setTags(tags.map(tag => ({ value: tag.nama_tag, label: tag.nama_tag })));
+            } catch (error) {
+                console.error('Error fetching quiz data:', error);
+            }
+        };
+        fetchQuizData();
+    }, [quizId]);
 
-  const handlePrevClick = () => {
-    setIsLoading(false);
-    setShowQuizizView(false);
-  };
-
-  const handleBackClick = () => {
-    navigate('/');
-  };
-
-  const handleTagChange = (selectedOptions) => {
-    setTags(selectedOptions);
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === ' ' && event.target.value.trim() !== '') {
-      const newTag = { value: event.target.value.trim(), label: event.target.value.trim() };
-      setTags([...tags, newTag]);
-      event.target.value = '';
-      event.preventDefault();
-    }
-  };
-
-  const handleFileInputChange = (event) => {
-    const selectedFile = event.target.files[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      setSelectedFileName(selectedFile.name);
-    }
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const droppedFile = e.dataTransfer.files[0];
-    setFile(droppedFile);
-    setSelectedFileName(droppedFile.name);
-  };
-
-  const getAllTag = async () => {
-    try {
-      const response = await axios.get("http://194.233.93.124:3030/quiz/tags");
-      setTags(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleSave = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('title', title);
-      formData.append('jumlahSoal', jumlahSoal);
-      formData.append('link', link);
-      formData.append('userId', userId);
-      formData.append('image', file);
-
-      tags.forEach((tag, index) => {
-        formData.append(`tags[${index}][nameTag]`, tag.value);
-      });
-
-      const response = await axios.patch(`http://194.233.93.124:3030/quiz/edit-quiz/${quizId}`, formData);
-      navigate('/');
-    } catch (error) {
-      setIsLoading(false);
-      setErrMsg(error.response.data.msg);
-    }
-  };
-
-  useEffect(() => {
-    const fetchQuizData = async () => {
-      try {
-        const response = await axios.get(`http://194.233.93.124:3030/quiz/quizzes/${quizId}`);
-        const { title, jumlahSoal, link, userId, tags } = response.data;
-        setTitle(title);
-        setJumlahSoal(jumlahSoal);
-        setLink(link);
-        setUserId(userId.toString());
-        setTags(tags.map((tag) => ({ value: tag.nameTag, label: tag.nameTag })));
-      } catch (error) {
-        console.error('Error fetching quiz data:', error);
-      }
+    const handleFileInputChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setFile(file);
+            setSelectedFileName(file.name);
+        }
     };
 
-    fetchQuizData();
-    getAllTag();
-  }, [quizId]);
+    const handleTagChange = selectedOptions => {
+        setTags(selectedOptions);
+    };
+
+    const handleNextClick = () => {
+        setShowQuizizView(true);
+    };
+
+    const handlePrevClick = () => {
+        setShowQuizizView(false);
+    };
+
+    const handleSave = async () => {
+        setIsLoading(true);
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('jumlahSoal', jumlahSoal);
+        formData.append('link', link);
+        formData.append('userId', userId);
+        if (file) {
+            formData.append('image', file);
+        }
+        tags.forEach((tag, index) => {
+            formData.append(`tags[${index}][nama_tag]`, tag.value);
+        });
+
+        try {
+            const response = await axios.patch(`http://194.233.93.124:3030/quiz/edit-quiz/${quizId}`, formData);
+            console.log(response.data);
+            navigate('/');
+        } catch (error) {
+            console.log(error);
+            setErrMsg(error.response?.data?.msg || "An error occurred");
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div>
@@ -140,7 +103,7 @@ const EditQuiz = () => {
             <div className="container mx-auto p-8">
                 {!showQuizizView ? (
                     <>
-                    <div style={{marginLeft: '20px', marginBottom: '30px', marginRight:'20px' }}>
+                    <div style={{marginLeft: '100px', marginBottom: '30px', marginRight:'100px' }}>
                         <ol class="flex items-center w-full text-sm font-medium text-center text-gray-500 dark:text-gray-400 sm:text-base">
                             <li class="flex md:w-full items-center text-blue-600 dark:text-blue-500 sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700">
                                 <span class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
@@ -156,8 +119,10 @@ const EditQuiz = () => {
                             </li>
                         </ol>
                     </div>
-                        <div className="mb-6">
-                            <label htmlFor="title" className="block text-gray-700 text-sm font-bold mb-2">
+                    <div className="flex flex-row">
+                        <div className="w-3/4 mr-4">
+                            <div className="mb-6">
+                            <label htmlFor="title" className="block text-gray-700 text-sm font-bold mb-2 ">
                                 Title
                             </label>
                             <input
@@ -165,10 +130,10 @@ const EditQuiz = () => {
                                 id="title"
                                 value={title}
                                 onChange={e => setTitle(e.target.value)}
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-[#F5F7F9]"
                             />
-                        </div>
-                        <div className="mb-6">
+                            </div>
+                            <div className="mb-6">
                             <label htmlFor="userId" className="block text-gray-700 text-sm font-bold mb-2">
                                 User ID
                             </label>
@@ -177,10 +142,10 @@ const EditQuiz = () => {
                                 id="userId"
                                 value={userId}
                                 onChange={e => setUserId(e.target.value)}
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-[#F5F7F9]"
                             />
-                        </div>
-                        <div className="mb-6">
+                            </div>
+                            <div className="mb-6">
                             <label htmlFor="tags" className="block text-gray-700 text-sm font-bold mb-2">
                                 Tags
                             </label>
@@ -190,11 +155,11 @@ const EditQuiz = () => {
                                 onChange={handleTagChange}
                                 options={tagOptions}
                                 isMulti
-                                className="basic-multi-select"
+                                className="basic-multi-select bg-[#F5F7F9]"
                                 classNamePrefix="select"
                             />
-                        </div>
-                        <div className="mb-6">
+                            </div>
+                            <div className="mb-6">
                             <label htmlFor="userId" className="block text-gray-700 text-sm font-bold mb-2">
                                 Jumlah Quiz
                             </label>
@@ -203,22 +168,42 @@ const EditQuiz = () => {
                                 id="userId"
                                 value={jumlahSoal}
                                 onChange={e => setJumlahSoal(e.target.value)}
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-[#F5F7F9]"
                             />
+                            </div>
                         </div>
-                        <div className="mb-6">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">
+                        <div className="w-1/4 flex justify-center mb-6 bg-[#F5F7F9]">
+                            <div className="flex flex-col items-center mt-14">
+                                <label className="block text-gray-700 text-sm font-bold mb-4 text-center">
                                 File Upload
-                            </label>
-                            <div className="flex items-center">
-                                <IoCloudUpload className="text-3xl text-gray-400" />
-                                <input
+                                </label>
+                                <div className="flex flex-col items-center">
+                                <div className="flex items-center justify-center bg-gray-200 rounded-full w-12 h-12 mb-4">
+                                    <IoCloudUpload className="text-3xl text-gray-400" />
+                                </div>
+                                <div className="text-sm text-gray-600 mb-2">Seret dan lepas di sini atau</div>
+                                <div className="mt-2">
+                                    <input
                                     type="file"
                                     onChange={handleFileInputChange}
-                                    className="ml-4"
-                                />
+                                    className="hidden"
+                                    id="fileInput"
+                                    />
+                                    <label
+                                    htmlFor="fileInput"
+                                    className="bg-[#38B0AB] hover:bg-[#2f8c87] text-white font-bold py-2 px-4 rounded cursor-pointer"
+                                    >
+                                    Pilih Gambar
+                                    </label>
+                                </div>
+                                </div>
+                                {selectedFileName && (
+                                <div className="mt-2 text-sm text-gray-600 text-center">
+                                    Selected file: {selectedFileName}
+                                </div>
+                                )}
                             </div>
-                            {selectedFileName && <div className="mt-2 text-sm text-gray-600">Selected file: {selectedFileName}</div>}
+                        </div>
                         </div>
                             <div className="flex justify-end gap-4">
                             <button
@@ -229,7 +214,7 @@ const EditQuiz = () => {
                             </button>
                             <button
                                 onClick={handleNextClick}
-                                className="bg-green-300 hover:bg-green-400 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                className="bg-[#38B0AB] hover:bg-green-400 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                             >
                                 Selanjutnya
                             </button>
@@ -237,7 +222,7 @@ const EditQuiz = () => {
                     </>
                 ) : (
                     <>
-                    <div style={{marginLeft: '20px', marginBottom: '20px', marginRight:'20px' }}>
+                    <div style={{marginLeft: '100px', marginBottom: '20px', marginRight:'100px' }}>
                     <ol class="flex items-center w-full text-sm font-medium text-center text-gray-500 dark:text-gray-400 sm:text-base">
                         <li class="flex md:w-full items-center text-gray-500 dark:text-gray-400 sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700">
                         <span class="me-2">1</span>
@@ -272,7 +257,7 @@ const EditQuiz = () => {
                                         id="link"
                                         value={link}
                                         onChange={e => setLink(e.target.value)}
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-[#F5F7F9]"
                                     />
                                 </div>
                                 {errMsg && <div className="text-red-500 text-xs italic mt-4">{errMsg}</div>}
@@ -287,7 +272,7 @@ const EditQuiz = () => {
                                         onClick={handleSave}
                                         className="bg-green-300 hover:bg-green-400 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                                     >
-                                        Edit
+                                        Simpan
                                     </button>
                                 </div>
                             </div>
@@ -298,5 +283,4 @@ const EditQuiz = () => {
         </div>
     );
 };
-
 export default EditQuiz;
