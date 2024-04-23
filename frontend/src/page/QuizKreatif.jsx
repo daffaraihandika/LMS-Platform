@@ -17,6 +17,7 @@ const QuizKreatif = () => {
   const [link, setLink] = useState("");
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
+  const [selectedReason, setSelectedReason] = useState("");
 
   const handleTambahQuizClick = () => {
     navigate("/tambah-quiz");
@@ -74,29 +75,6 @@ const QuizKreatif = () => {
   return (
     <div>
       <NavbarQuiz />
-      <div className="block">
-        {showModal && (
-          <div className="fixed inset-0 flex items-center justify-center">
-            <div className="absolute inset-0 bg-gray-900 opacity-50"></div>
-            <div className="bg-white p-8 rounded max-w-sm">
-              <button onClick={handleClose}>&times;</button>
-              <input
-                type="text"
-                value={link}
-                onChange={(e) => setLink(e.target.value)}
-                className="border rounded py-2 px-3 w-full my-2"
-                placeholder="Enter link"
-              />
-              <button
-                onClick={handleSaveChanges}
-                className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Masuk Quiz
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
       <div className="container mx-auto p-8">
         <div className="mb-4">
           <div className="flex justify-between mb-3 flex-col">
@@ -117,16 +95,68 @@ const QuizKreatif = () => {
                 >
                   Join Quiz
                 </button>
+                {showModal && (
+                  <div>
+                    <div className="fixed inset-0 bg-black opacity-50 z-[30]"></div>
+                    <div className="fixed inset-0 flex items-center justify-center z-[99]">
+                      <div className="bg-white rounded-lg p-6 w-1/2">
+                        {/* Konten modal */}
+                        <h2 className="text-lg font-bold mb-4 w-full">
+                          Masukkan Link Quiz
+                        </h2>
+                        <div className="">
+                          <p className="text-gray-700 flex w-full justify-between">
+                            <input
+                              type="text"
+                              value={link}
+                              onChange={(e) => setLink(e.target.value)}
+                              className="border rounded py-2 px-3 w-full my-2"
+                              placeholder="Enter link"
+                            />
+                          </p>
+                          <div className="flex justify-end gap-2">
+                            <button
+                              onClick={() => setShowModal(false)}
+                              className="bg-white hover:bg-gray-300 text-teal-500 text-sm border border-teal-500 py-2 px-4 mt-4 rounded"
+                            >
+                              Tutup
+                            </button>
+                            <button
+                              onClick={handleSaveChanges}
+                              className="bg-teal-500 hover:bg-teal-700 text-white text-sm px-4 py-1 mt-4 rounded"
+                            >
+                              Masuk Quiz
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="relative inline-block text-left flex items-center">
                 <TbCategory className="mr-3 text-teal-400 text-2xl mb-5" />
-                <button
-                  type="button"
-                  className="text-sm bg-white text-gray-500 border border-gray-300 py-2 pr-56 pl-3 rounded-lg mb-4 text-left inline-flex items-center"
-                >
-                  Kategori Quiz
-                </button>
+                <select className="text-sm bg-white text-gray-500 border border-gray-300 py-2 pr-48 pl-3 rounded-lg mb-4 text-left inline-flex items-center appearance-none">
+                  <option>Semua Kategori Quiz</option>
+                  {tags.map((tag) => (
+                    <option key={tag.id}>{tag.nama_tag}</option>
+                  ))}
+                </select>
+                <div className="absolute right-2 transform -translate-y-1/2 pointer-events-none">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 14.586L5.707 10.293a1 1 0 011.414-1.414L10 12.586l3.879-3.879a1 1 0 111.414 1.414L10 14.586z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
@@ -198,7 +228,7 @@ const QuizKreatif = () => {
                       <button className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500  border border-teal-500 rounded mr-2">
                         <CopyToClipboard text={quiz.link} onCopy={handleShareClick}>
                           <div onClick={handleShareClick} className="flex flex-col items-center justify-center">
-                            <CiShare2 className=""/>
+                            <CiShare2 className="" />
                             <p className="text-[9px] m-0">Bagikan</p>
                           </div>
                         </CopyToClipboard>
@@ -211,48 +241,109 @@ const QuizKreatif = () => {
                         <p className="text-[9px]">Laporkan</p>
                       </button>
                       {modalShow && (
-                        <div className="fixed inset-0 flex items-center justify-center">
-                          <div className="absolute inset-0 bg-gray-900 opacity-50"></div>
-                          <div className="bg-white p-8 rounded max-w-sm">
-                            <button onClick={() => setModalShow(false)}>
-                              &times;
-                            </button>
-                            <div>
-                              <h5 className="mb-4 font-bold">
-                                Apa jenis masalah yang anda laporkan?
-                              </h5>
-                              <div className="flex flex-col">
-                                <label className="inline-flex items-center">
-                                  <input
-                                    type="radio"
-                                    className="form-radio"
-                                    name="reportType"
-                                  />
-                                  <span className="ml-2">Plagiat</span>
-                                </label>
-                                <label className="inline-flex items-center">
-                                  <input
-                                    type="radio"
-                                    className="form-radio"
-                                    name="reportType"
-                                  />
-                                  <span className="ml-2">Privasi</span>
-                                </label>
-                                <label className="inline-flex items-center">
-                                  <input
-                                    type="radio"
-                                    className="form-radio"
-                                    name="reportType"
-                                  />
-                                  <span className="ml-2">
-                                    Penghinaan & Pelecehan secara Online
-                                  </span>
-                                </label>
+                        <div>
+                          <div className="fixed inset-0 bg-black bg-opacity-10"></div>
+                          <div className="fixed inset-0 flex items-center justify-center z-50 full">
+                            <div className="bg-white rounded p-8 max-w-md">
+                              <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-lg font-bold">Laporkan</h2>
+                                <button onClick={() => setModalShow(false)}>
+                                  &times;
+                                </button>
+                              </div>
+
+                              <hr />
+                              <div className="bg-white rounded max-w-md">
+                                <div className="flex items-center p-3 justify-between mb-2">
+                                  <p className="text-md font-bold">
+                                    Apa masalah yang ingin anda laporkan ?{" "}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="grid bg-teal-50 p-3 rounded border border-gray-400 w-full">
+                                <div className="mr-3 gap-5 justify-between">
+                                  <div className="flex mt-1 items-center justify-between">
+                                    <label
+                                      htmlFor="plagiat"
+                                      className="ml-2 w-10/12"
+                                    >
+                                      <b>Plagiat</b>
+                                      <br />
+                                      <p className="text-sm">
+                                        Quiz atau pertanyaan dalam quiz
+                                        merupakan plagiat dari sumber lain tanpa
+                                        izin atau atribusi yang tepat
+                                      </p>
+                                    </label>
+                                    <input
+                                      type="radio"
+                                      id="plagiat"
+                                      name="reportReason"
+                                      value="plagiat"
+                                      className="form-radio h-4 w-4 text-teal-500"
+                                      onChange={handleRadioChange}
+                                    />
+                                  </div>
+                                  <div className="flex mt-5 items-center justify-between">
+                                    <label
+                                      htmlFor="privasi"
+                                      className="ml-2 w-10/12"
+                                    >
+                                      <b>Privasi</b>
+                                      <br />
+                                      <p className="text-sm">
+                                        Membagikan informasi pribadi, mengancam
+                                        akan membagikan/menyebarkan informasi
+                                        pribadi
+                                      </p>
+                                    </label>
+                                    <input
+                                      type="radio"
+                                      id="privasi"
+                                      name="reportReason"
+                                      value="privasi"
+                                      className="form-radio h-4 w-4 text-teal-500"
+                                      onChange={handleRadioChange}
+                                    />
+                                  </div>
+                                  <div className="flex mt-5 items-center justify-between">
+                                    <label
+                                      htmlFor="penghinaan"
+                                      className="ml-2 w-10/12"
+                                    >
+                                      <b>
+                                        Penghinaan & Pelecehan secara Online
+                                      </b>
+                                      <br />
+                                      <p className="text-sm">
+                                        Penghinaan, konten seksual yang tidak
+                                        diinginkan, konten NSFW & grafis yang
+                                        tidak diinginkan, pelecehan bertarget
+                                      </p>
+                                    </label>
+                                    <input
+                                      type="radio"
+                                      id="penghinaan"
+                                      name="reportReason"
+                                      value="penghinaan"
+                                      className="form-radio h-4 w-4 text-teal-500"
+                                      onChange={handleRadioChange}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex justify-end">
+                                <button
+                                  disabled={!selectedReason}
+                                  className={`${selectedReason
+                                      ? "bg-teal-500 hover:bg-teal-700"
+                                      : "bg-gray-300 cursor-not-allowed"
+                                    } text-white text-sm py-2 px-4 rounded-md mt-4`}
+                                >
+                                  Laporkan
+                                </button>
                               </div>
                             </div>
-                            <button className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded mt-4">
-                              Laporkan
-                            </button>
                           </div>
                         </div>
                       )}
