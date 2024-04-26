@@ -10,6 +10,7 @@ import { MdFormatListBulleted } from "react-icons/md";
 import { TbCategory } from "react-icons/tb";
 import NavbarQuiz from "../components/NavbarQuiz";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { IoIosSearch } from "react-icons/io";
 
 const MyQuiz = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -20,7 +21,8 @@ const MyQuiz = () => {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const { userId } = useParams();
- 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showCopyNotification, setShowCopyNotification] = useState(false);
 
   const handleTambahQuizClick = () => {
     navigate("/tambah-quiz");
@@ -61,10 +63,35 @@ const MyQuiz = () => {
   };
 
   const handleShareClick = () => {
-    setCopied(true);
+    setShowCopyNotification(true);
     setTimeout(() => {
-      setCopied(false);
-    }, 1500); // Setelah 1.5 detik, atur status penyalinan kembali ke false
+      setShowCopyNotification(false);
+    }, 2000); // Notifikasi akan hilang setelah 2 detik
+  };
+
+  const handleDeleteQuiz = async (quizId) => {
+    try {
+      const response = await axios.delete(`http://194.233.93.124:3030/quiz/${quizId}`);
+      console.log(response.data);
+      // Refresh the quizzes list after deletion
+      getMyQuiz();
+    } catch (error) {
+      console.error("Failed to delete quiz:", error);
+    }
+  };
+  
+  const handleEditQuiz = (quizId) => {
+    // Assuming you have a route to navigate to the edit page
+    navigate(`/edit-quiz/${quizId}`);
+  };
+  
+  const handleInputChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleSearch = () => {
+    console.log('Searching for:', searchTerm);
+    // Implementasi fungsi pencarian di sini
   };
 
   useEffect(() => {
@@ -98,6 +125,11 @@ const MyQuiz = () => {
         )}
       </div>
       <div className="container mx-auto p-8">
+        {showCopyNotification && (
+          <div className="fixed top-20 right-1/2 transform translate-x-1/2 bg-blue-500 text-white py-2 px-4 rounded-xl z-50">
+            Link telah di-copy!
+          </div>
+        )}
         <div className="mb-4">
           <div className="flex justify-between mb-3 flex-col">
             <div>
@@ -111,25 +143,30 @@ const MyQuiz = () => {
                 >
                   Tambah Quiz
                 </button>
-                <button
-                  onClick={() => setShowModal(true)}
-                  className="bg-white hover:bg-gray-100 text-teal-500 text-sm py-2 px-12 border border-teal-500 rounded"
-                >
-                  Join Quiz
-                </button>
               </div>
 
-              <div className="relative inline-block text-left flex items-center">
-                <TbCategory className="mr-3 text-teal-400 text-2xl mb-5" />
-                <button
-                  type="button"
-                  className="text-sm bg-white text-gray-500 border border-gray-300 py-2 pr-56 pl-3 rounded-lg mb-4 text-left inline-flex items-center"
-                >
-                  Find My Quiz
-                </button>
+              <div className="mb-4 relative">
+                <input
+                  type="text"
+                  className="text-sm bg-white text-gray-500 border border-gray-300 py-2 pl-3 rounded-lg text-left inline-flex items-center w-full"
+                  placeholder="Find My Quiz"
+                  value={searchTerm}
+                  onChange={handleInputChange}
+                  onKeyPress={(event) => {
+                    if (event.key === 'Enter') {
+                      handleSearch();
+                    }
+                  }}
+                />
+                <IoIosSearch
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg"
+                  onClick={handleSearch}
+                />
               </div>
+
             </div>
           </div>
+          
           <div className="container bg-slate-50 mx-auto p-6 rounded-lg">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {quizzes.map((quiz) => (
@@ -198,30 +235,30 @@ const MyQuiz = () => {
                     </div>
                   <div className="flex gap-1">
                     <button
-                      onClick={() => setModalShow(true)}
+                      onClick={() => handleDeleteQuiz(quiz.id)}
                       className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
-                    >
-                      <MdDeleteOutline className="" />
+                   >
+                      <MdDeleteOutline />
                       <p className="text-[5px]"></p>
-                    </button>
-                    <button
-                      onClick={() => setModalShow(true)}
+                   </button>
+                   <button
+                      onClick={() => handleEditQuiz(quiz.id)}
                       className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
-                    >
-                      <FaRegEdit className="" />
+                  >
+                      <FaRegEdit />
                       <p className="text-[5px]"></p>
-                    </button>
-                    <button
-                      onClick={() => setModalShow(true)}
-                      className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded mr-2"
-                    >
-                      <CopyToClipboard text={quiz.link} onCopy={handleShareClick}>
-                        <div onClick={handleShareClick} className="flex flex-col items-center justify-center">
-                          <CiShare2 className=""/>
-                          <p className="text-[5px] m-0"></p>
-                        </div>
-                      </CopyToClipboard>
-                    </button>
+                  </button>
+                  <button
+                    onClick={() => setModalShow(true)}
+                    className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded mr-2"
+                  >
+                    <CopyToClipboard text={quiz.link} onCopy={handleShareClick}>
+                      <div className="flex flex-col items-center justify-center">
+                        <CiShare2 className=""/>
+                        <p className="text-[5px] m-0"></p>
+                      </div>
+                    </CopyToClipboard>
+                  </button>
                   </div>
                 </div>
                 </div>

@@ -48,6 +48,7 @@ const EditQuiz = () => {
   };
 
   const handleTagChange = (selectedOptions) => {
+    console.log(selectedOptions);
     setTags(selectedOptions);
   };
 
@@ -85,7 +86,8 @@ const EditQuiz = () => {
   const getAllTag = async () => {
     try {
       const response = await axios.get("http://194.233.93.124:3030/quiz/tags");
-      setTags(response.data);
+      console.log(response.data); 
+      setTagOptions(response.data.map(tag => ({ value: tag.nama_tag, label: tag.nama_tag })));
     } catch (error) {
       console.log(error);
     }
