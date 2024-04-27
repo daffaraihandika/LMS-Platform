@@ -18,6 +18,7 @@ const QuizKreatif = () => {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [selectedReason, setSelectedReason] = useState("");
+  const [currentQuizId, setCurrentQuizId] = useState(null);
 
   const handleTambahQuizClick = () => {
     navigate("/tambah-quiz");
@@ -29,6 +30,7 @@ const QuizKreatif = () => {
         "http://194.233.93.124:3030/quiz/quizzes"
       );
       setQuizzes(response.data);
+      console.log(response.data)
     } catch (error) {
       console.log(error);
     }
@@ -60,7 +62,7 @@ const QuizKreatif = () => {
     setCopied(true);
     setTimeout(() => {
       setCopied(false);
-    }, 1500); // Setelah 1.5 detik, atur status penyalinan kembali ke false
+    }, 1500);
   };
 
   const handleRadioChange = (event) => {
@@ -82,6 +84,29 @@ const QuizKreatif = () => {
     }
   };
 
+  const handleReportSubmit = async (quizId) => {
+    try {
+      const response = await axios.post('http://194.233.93.124:3030/quiz/report', {
+        user_id: "2",
+        quiz_id: quizId,
+        report_type: selectedReason
+      });
+
+      if (response.status === 201) {
+        alert("Thank you for your report. We will review it shortly.");
+        setModalShow(false);  // Close the modal after successful report
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        alert("You have already reported this quiz.");
+      } else {
+        alert("There was an error processing your report. Please try again later.");
+      }
+      console.error('Error submitting report:', error);
+    }
+  };
+
+
   useEffect(() => {
     getAllQuiz();
     getAllTag();
@@ -91,6 +116,11 @@ const QuizKreatif = () => {
     <div>
       {/* <NavbarQuiz /> */}
       <div className="container mx-auto p-8">
+        {copied && (
+          <div className="fixed top-20 right-1/2 transform translate-x-1/2 bg-blue-500 text-white py-2 px-4 rounded-xl z-50">
+            Link telah di-copy!
+          </div>
+        )}
         <div className="mb-4">
           <div className="flex justify-between mb-3 flex-col">
             <div>
@@ -226,7 +256,7 @@ const QuizKreatif = () => {
                       </div>
                       <div className="flex items-center px-3 gap-2">
                         <MdFormatListBulleted className="text-orange-400" />
-                        <p>10 Qs</p>
+                        <p>{quiz.jumlahSoal} Qs</p>
                       </div>
                     </div>
                   </div>
@@ -254,7 +284,10 @@ const QuizKreatif = () => {
                         </CopyToClipboard>
                       </button>
                       <button
-                        onClick={() => setModalShow(true)}
+                        onClick={() => {
+                          setModalShow(true);
+                          setCurrentQuizId(quiz.id);
+                        }}
                         className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
                       >
                         <GoReport className="" />
@@ -299,7 +332,7 @@ const QuizKreatif = () => {
                                       type="radio"
                                       id="plagiat"
                                       name="reportReason"
-                                      value="plagiat"
+                                      value="Plagiat"
                                       className="form-radio h-4 w-4 text-teal-500"
                                       onChange={handleRadioChange}
                                     />
@@ -321,7 +354,7 @@ const QuizKreatif = () => {
                                       type="radio"
                                       id="privasi"
                                       name="reportReason"
-                                      value="privasi"
+                                      value="Privasi"
                                       className="form-radio h-4 w-4 text-teal-500"
                                       onChange={handleRadioChange}
                                     />
@@ -345,7 +378,7 @@ const QuizKreatif = () => {
                                       type="radio"
                                       id="penghinaan"
                                       name="reportReason"
-                                      value="penghinaan"
+                                      value="Penghinaan & Pelecehan secara Online"
                                       className="form-radio h-4 w-4 text-teal-500"
                                       onChange={handleRadioChange}
                                     />
@@ -354,11 +387,9 @@ const QuizKreatif = () => {
                               </div>
                               <div className="flex justify-end">
                                 <button
+                                  onClick={() => handleReportSubmit(currentQuizId)} 
                                   disabled={!selectedReason}
-                                  className={`${selectedReason
-                                    ? "bg-teal-500 hover:bg-teal-700"
-                                    : "bg-gray-300 cursor-not-allowed"
-                                    } text-white text-sm py-2 px-4 rounded-md mt-4`}
+                                  className={`${selectedReason ? "bg-teal-500 hover:bg-teal-700" : "bg-gray-300 cursor-not-allowed"} text-white text-sm py-2 px-4 rounded-md mt-4`}
                                 >
                                   Laporkan
                                 </button>
