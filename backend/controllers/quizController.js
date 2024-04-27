@@ -7,6 +7,7 @@ export const getQuiz = async (req, res) => {
     const { tag } = req.query;
     let response;
 
+    // Jika tag ada, maka filter berdasarkan tag
     if (tag) {
       response = await prisma.Quiz.findMany({
         where: {
@@ -42,22 +43,80 @@ export const getQuiz = async (req, res) => {
 };
 
 export const getQuizByUser = async (req, res) => {
-  const userId = req.params.userId; // mengambil userId dari parameter
+  const userId = req.params.userId;
   try {
-    const response = await prisma.Quiz.findMany({
-      where: {
-        userId: Number(userId), // filter berdasarkan userId
-      },
-      include: {
-        tags: true,
-        user: true,
-      },
-    });
+    const { tag } = req.query;
+    let response;
+
+    // Jika tag ada, maka filter berdasarkan tag
+    if (tag) {
+      response = await prisma.Quiz.findMany({
+        where: {
+          userId: Number(userId),
+          tags: {
+            some: {
+              nameTag: tag,
+            },
+          },
+        },
+        orderBy: {
+          id: 'desc',
+        },
+        include: {
+          tags: true,
+          user: true,
+        },
+      });
+    } else {
+      response = await prisma.Quiz.findMany({
+        where: {
+          userId: Number(userId),
+        },
+        orderBy: {
+          id: 'desc',
+        },
+        include: {
+          tags: true,
+          user: true,
+        },
+      });
+    }
+
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
 };
+
+export const getQuizById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ msg: "ID quiz harus diisi" });
+    }
+
+    const quiz = await prisma.quiz.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+      include: {
+        user: true,
+        tags: true,
+      },
+    });
+
+    if (!quiz) {
+      return res.status(404).json({ msg: "Quiz tidak ditemukan" });
+    }
+
+    res.status(200).json(quiz);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Terjadi kesalahan saat mengambil quiz" });
+  }
+};
+
 
 export const createQuiz = async (req, res) => {
   try {
@@ -99,10 +158,6 @@ export const createQuiz = async (req, res) => {
         tags: true,
       },
     });
-
-    console.log("req body: berhasil");
-    console.log("req body: ", req.body);
-    console.log("req file: ", req.file);
     console.log("quiz: ", newQuiz);
 
     return res.status(201).json({
@@ -210,14 +265,45 @@ export const deleteQuiz = async (req, res) => {
       return res.status(400).json({ msg: "ID quiz harus diisi" });
     }
 
+    // Menghapus quiz
     const deletedQuiz = await prisma.quiz.delete({
       where: {
         id: parseInt(id),
       },
-      select: {
-        title: true,
+      include: {
+        tags: true,
       },
     });
+
+    // Mengambil tag-tag yang terkait dengan quiz yang dihapus
+    const deletedQuizTags = deletedQuiz.tags.map(tag => tag.nameTag);
+
+    // Mengecek apakah ada quiz lain yang masih menggunakan tag yang terkait
+    const otherQuizzes = await prisma.quiz.findMany({
+      where: {
+        id: {
+          not: parseInt(id),
+        },
+        tags: {
+          some: {
+            nameTag: {
+              in: deletedQuizTags,
+            },
+          },
+        },
+      },
+    });
+
+    // Jika tidak ada quiz lain yang menggunakan tag tersebut, hapus tag dari database
+    const tagsToDelete = deletedQuizTags.filter(tag => !otherQuizzes.some(quiz => quiz.tags.some(qTag => qTag.nameTag === tag)));
+
+    await Promise.all(tagsToDelete.map(async (tagName) => {
+      await prisma.tag.deleteMany({
+        where: {
+          nameTag: tagName,
+        },
+      });
+    }));
 
     return res.status(200).json({
       msg: `Berhasil menghapus quiz ${deletedQuiz.title}`,
@@ -229,3 +315,5 @@ export const deleteQuiz = async (req, res) => {
       .json({ msg: "Terjadi kesalahan saat menghapus quiz" });
   }
 };
+
+

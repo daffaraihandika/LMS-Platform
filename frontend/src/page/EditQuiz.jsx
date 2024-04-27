@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Creatable from 'react-select/creatable';
 // import NavbarQuiz from '../components/NavbarQuiz';
@@ -7,7 +7,7 @@ import { FaCheck } from 'react-icons/fa';
 import { IoCloudUpload } from 'react-icons/io5';
 
 
-const TambahQuiz = () => {
+const EditQuiz = () => {
     const [title, setTitle] = useState('');
     const [jumlahSoal, setJumlahSoal] = useState('');
     const [link, setLink] = useState('');
@@ -20,6 +20,7 @@ const TambahQuiz = () => {
     const [tagOptions, setTagOptions] = useState([]);
     const [errMsg, setErrMsg] = useState('');
     const navigate = useNavigate();
+    const { quizId } = useParams();
 
     useEffect(() => {
         const getAllTag = async () => {
@@ -31,18 +32,38 @@ const TambahQuiz = () => {
             }
         };
         getAllTag();
-    }, []);
 
-    const handleFileInputChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            setFile(file);
-            setSelectedFileName(file.name);
-        }
+        const fetchQuizData = async () => {
+            try {
+                const response = await axios.get(`http://194.233.93.124:3030/quiz/quizzes/${quizId}`);
+                const { title, jumlahSoal, link, userId, tags } = response.data;
+                setTitle(title);
+                setJumlahSoal(jumlahSoal);
+                setLink(link);
+                setUserId(userId);
+                setTags(tags.map(tag => ({ value: tag.nama_tag, label: tag.nama_tag })));
+            } catch (error) {
+                console.error('Error fetching quiz data:', error);
+            }
+        };
+        fetchQuizData();
+    }, [quizId]);
+
+    const handleNextClick = () => {
+        setShowQuizizView(true);
     };
 
-    const handleTagChange = selectedOptions => {
-        setTags(selectedOptions);
+    const handlePrevClick = () => {
+        setIsLoading(false);
+        setShowQuizizView(false);
+    };
+
+    const handleBackClick = () => {
+        navigate('/');
+    };
+
+    const handleTagChange = (selectedOptions) => {
+        setTags(selectedOptions || []);
     };
 
     const handleCreateTag = (inputValue) => {
@@ -51,16 +72,12 @@ const TambahQuiz = () => {
         setTags(prevTags => [...prevTags, newTag]);
     };
 
-    const handleNextClick = () => {
-        setShowQuizizView(true);
-    };
-
-    const handlePrevClick = () => {
-        setShowQuizizView(false);
-    };
-
-    const handleBackClick = () => {
-        navigate('/');
+    const handleFileInputChange = (event) => {
+        const selectedFile = event.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            setSelectedFileName(selectedFile.name);
+        }
     };
 
     const handleSave = async () => {
@@ -70,17 +87,19 @@ const TambahQuiz = () => {
         formData.append('jumlahSoal', jumlahSoal);
         formData.append('link', link);
         formData.append('userId', userId);
-        formData.append('image', file);
+        if (file) {
+            formData.append('image', file);
+        }
         tags.forEach((tag, index) => {
             formData.append(`tags[${index}][nama_tag]`, tag.value);
         });
 
         try {
-            const response = await axios.post('http://194.233.93.124:3030/quiz/new-quiz', formData);
+            const response = await axios.put(`http://194.233.93.124:3030/quiz/edit-quiz/${quizId}`, formData);
             console.log(response.data);
             navigate('/');
         } catch (error) {
-            console.log(error)
+            console.log(error);
             setErrMsg(error.response?.data?.msg || "An error occurred");
             setIsLoading(false);
         }
@@ -94,7 +113,6 @@ const TambahQuiz = () => {
             setSelectedFileName(file.name);
         }
     };
-
 
     return (
         <div>
@@ -283,5 +301,4 @@ const TambahQuiz = () => {
         </div>
     );
 };
-
-export default TambahQuiz;
+export default EditQuiz;

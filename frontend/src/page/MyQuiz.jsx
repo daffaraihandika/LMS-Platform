@@ -1,28 +1,28 @@
-import { useParams } from "react-router-dom";
-import { React, useEffect, useState } from "react";
-import { Container, Image } from "react-bootstrap";
-import Button from "react-bootstrap/Button";
-import Dropdown from "react-bootstrap/Dropdown";
-import { GoTrash } from "react-icons/go";
-import { CiShare2 } from "react-icons/ci";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Card from "react-bootstrap/Card";
-import { useNavigate } from "react-router-dom";
-import Badge from "react-bootstrap/Badge";
-import Stack from "react-bootstrap/Stack";
-import { IoIosNotificationsOutline } from "react-icons/io";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import NavbarQuiz from "../components/NavbarQuiz";
-import Alert from "react-bootstrap/Alert";
+import { IoIosNotificationsOutline } from "react-icons/io";
+import { CiShare2 } from "react-icons/ci";
 import { FaRegEdit } from "react-icons/fa";
+import { MdPeople } from "react-icons/md";
+import { MdDeleteOutline } from "react-icons/md";
+import { MdFormatListBulleted } from "react-icons/md";
+import { TbCategory } from "react-icons/tb";
+// import NavbarQuiz from "../components/NavbarQuiz";
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { IoIosSearch } from "react-icons/io";
 
 const MyQuiz = () => {
   const [quizzes, setQuizzes] = useState([]);
-  const [deleteMessage, setDeleteMessage] = useState("");
+  const [tags, setTags] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [modalShow, setModalShow] = useState(false);
+  const [link, setLink] = useState("");
   const navigate = useNavigate();
+  const [copied, setCopied] = useState(false);
   const { userId } = useParams();
-  const { quizId } = useParams();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showCopyNotification, setShowCopyNotification] = useState(false);
 
   const handleTambahQuizClick = () => {
     navigate("/tambah-quiz");
@@ -31,7 +31,7 @@ const MyQuiz = () => {
   const getMyQuiz = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/quizzes/user/${userId}`
+        `http://194.233.93.124:3030/quiz/quizzes/user/${userId}`
       );
       setQuizzes(response.data);
       console.log(response.data);
@@ -42,208 +42,239 @@ const MyQuiz = () => {
 
   const getAllTag = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/tags");
-      console.log(response.data);
+      const response = await axios.get("http://194.233.93.124:3030/quiz/tags");
+      setTags(response.data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleDelete = (quizId) => {
-    const confirmDelete = window.confirm(
-      "Apakah kamu yakin akan menghapus quiz ini?"
-    );
+  const handleClose = () => {
+    setShowModal(false);
+  };
+
+  const handleSaveChanges = () => {
+    let formattedLink = link;
+    if (!formattedLink.startsWith("http://") && !formattedLink.startsWith("https://")) {
+      formattedLink = "http://" + formattedLink;
+    }
+    handleClose();
+    window.open(formattedLink, "_blank");
+  };
+
+  const handleShareClick = () => {
+    setShowCopyNotification(true);
+    setTimeout(() => {
+      setShowCopyNotification(false);
+    }, 2000); // Notifikasi akan hilang setelah 2 detik
+  };
+
+  const handleDeleteQuiz = async (quizId) => {
+    const confirmDelete = window.confirm("Apakah anda yakin ingin menghapus quiz ini?");
     if (confirmDelete) {
-      axios
-        .delete(`http://localhost:5000/quiz/${quizId}`)
-        .then((response) => {
-          const message = response.data.msg;
-          console.log(message);
-          setDeleteMessage(message);
-          navigate(`/my-quiz/${userId}`);
-        })
-        .catch((error) => {
-          console.error("Error deleting quiz:", error);
-        });
+      try {
+        const response = await axios.delete(`http://194.233.93.124:3030/quiz/quiz/${quizId}`);
+        console.log(response.data);
+        getMyQuiz();
+      } catch (error) {
+        console.error("Failed to delete quiz:", error);
+        alert("Failed to delete quiz. Please try again.");
+      }
     }
   };
+
+
+  const handleEditQuiz = (quizId) => {
+    navigate(`/edit-quiz/${quizId}`);
+  };
+
+  const handleInputChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get(`http://194.233.93.124:3030/quiz/quizzes/user/${userId}?search=${encodeURIComponent(searchTerm)}`);
+      setQuizzes(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching quizzes:", error);
+    }
+  };
+
 
   useEffect(() => {
     getMyQuiz();
     getAllTag();
   }, [userId]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDeleteMessage("");
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [deleteMessage]);
-
-  const buttonStyle = {
-    backgroundColor: "#38B0AB",
-    color: "#FFFFFF",
-  };
-
   return (
     <div>
-      <NavbarQuiz />
-
-      <Container>
-        <Row>
-          <Col>
-            <div className="title">
-              <h1>My Quiz</h1>
+      <div className="block">
+        {showModal && (
+          <div className="fixed inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 bg-gray-900 opacity-50"></div>
+            <div className="bg-white p-8 rounded max-w-sm">
+              <button onClick={handleClose}>&times;</button>
+              <input
+                type="text"
+                value={link}
+                onChange={(e) => setLink(e.target.value)}
+                className="border rounded py-2 px-3 w-full my-2"
+                placeholder="Enter link"
+              />
+              <button
+                onClick={handleSaveChanges}
+                className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Masuk Quiz
+              </button>
             </div>
-            <div className="header d-flex justify-content-between align-items-center mb-3">
-              <div>
-                <Button style={buttonStyle} onClick={handleTambahQuizClick}>
-                  Tambah Quiz
-                </Button>{" "}
-              </div>
-              <div>
-                <Dropdown>
-                  <Dropdown.Toggle style={buttonStyle} id="dropdown-basic">
-                    Kategori Quiz
-                  </Dropdown.Toggle>
-
-                  <Dropdown.Menu>
-                    <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">
-                      Another action
-                    </Dropdown.Item>
-                    <Dropdown.Item href="#/action-3">
-                      Something else
-                    </Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </div>
-            </div>
-          </Col>
-        </Row>
-
+          </div>
+        )}
+      </div>
+      <div className="container mx-auto p-8">
+        {showCopyNotification && (
+          <div className="fixed top-20 right-1/2 transform translate-x-1/2 bg-blue-500 text-white py-2 px-4 rounded-xl z-50">
+            Link telah di-copy!
+          </div>
+        )}
         <div className="mb-4">
-          <Container className="h-screen d-flex align-items-center justify-content-center p-20">
-            <Row className="w-100 bg-light rounded p-5 d-flex flex-wrap gap-5">
-              {deleteMessage && (
-                <Alert key="danger" variant="danger">
-                  {deleteMessage}
-                </Alert>
-              )}
+          <div className="flex justify-between mb-3 flex-col">
+            <div>
+              <p className="text-3xl font-semibold mb-8">My Quiz</p>
+            </div>
+            <div className="flex justify-between">
+              <div>
+                <button
+                  onClick={handleTambahQuizClick}
+                  className="bg-teal-500 hover:bg-teal-700 text-white text-sm py-2 px-6 rounded mr-2"
+                >
+                  Tambah Quiz
+                </button>
+              </div>
+
+              <div className="mb-4 relative">
+                <input
+                  type="text"
+                  className="text-sm bg-white text-gray-500 border border-gray-300 py-2 pl-3 rounded-lg text-left inline-flex items-center w-full"
+                  placeholder="Find My Quiz"
+                  value={searchTerm}
+                  onChange={handleInputChange}
+                  onKeyPress={(event) => {
+                    if (event.key === 'Enter') {
+                      handleSearch();
+                    }
+                  }}
+                />
+                <IoIosSearch
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg"
+                  onClick={handleSearch}
+                />
+              </div>
+
+            </div>
+          </div>
+
+          <div className="container bg-slate-50 mx-auto p-6 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {quizzes.map((quiz) => (
-                <Card key={quiz.id} style={{ width: "22rem" }}>
+                <div
+                  key={quiz.id}
+                  className="max-w-sm rounded-lg overflow-hidden shadow-lg p-5 bg-white"
+                >
+                  <div className="font-semibold text-xl mb-4">{quiz.title}</div>
                   {quiz.image && (
-                    <div
-                      className="d-flex justify-content-center align-items-center mt-3"
-                      style={{ height: "170px" }}
-                    >
-                      <Card.Img
+                    <div>
+                      <img
+                        className="object-cover w-96 h-48 rounded"
                         src={quiz.image}
-                        style={{
-                          width: "300px",
-                          height: "170px",
-                          objectFit: "cover",
-                        }}
+                        alt={quiz.title}
                       />
                     </div>
                   )}
-                  <Card.Body>
-                    <Card.Title>{quiz.title}</Card.Title>
-                    <div className="d-flex align-items-center mb-4">
-                      <Image
+
+                  <div className="flex items-center mt-5 gap-3">
+                    <div className="flex h-full items-center">
+                      <img
+                        className="h-10 w-10 rounded-full"
                         src="https://3.bp.blogspot.com/-oa9m6Vjs78s/VMCqdcEo_lI/AAAAAAAAAqw/3GeZJLcpCYQ/s1600/IMG_0008.JPG"
-                        roundedCircle
-                        style={{
-                          width: "30px",
-                          height: "30px",
-                          marginRight: "10px",
-                        }}
                       />
-                      <div>
-                        <p className="mb-0" style={{ fontSize: "16px" }}>
-                          {quiz.user.name}
-                        </p>
+                    </div>
+                    <div className="flex w-full justify-between mt-2 mb-2">
+                      <div className="flex-col">
+                        <div>
+                          <span className="text-sm text-gray-950">
+                            Anya Felissa
+                          </span>
+                        </div>
                       </div>
-                      <div
-                        className="ml-auto d-flex align-items-center"
-                        style={{ marginLeft: "60px" }}
-                      ></div>
+                      <div className="flex items-center px-3 gap-2">
+                        <MdFormatListBulleted className="text-orange-400" />
+                        <p>{quiz.jumlahSoal} Qs</p>
+                      </div>
                     </div>
-                    <div className="d-flex justify-content-start mb-4">
-                      <Stack direction="horizontal" gap={2}>
-                        {quiz.tags.map((tag) => (
-                          <Badge
-                            key={tag.id}
-                            style={{
-                              backgroundColor: "#F9A682",
-                              color: "#B23E19",
-                            }}
-                            bg="none"
-                          >
-                            {tag.nameTag}
-                          </Badge>
-                        ))}
-                      </Stack>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <p className="mt-3" style={{ fontSize: "12px" }}>
-                        Dibuat tanggal
-                        {new Date(quiz.createdAt).toLocaleDateString("id-ID", {
+                  </div>
+                  <div className="mt-5">
+                    {quiz.tags.map((tag) => (
+                      <span
+                        key={tag.id}
+                        className="inline-block bg-orange-300 rounded-md px-3 py-1 text-xs text-red-600 mr-2"
+                      >
+                        {tag.nama_tag}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-5 flex justify-between items-start w-full">
+                    <div className="border border-gray-200 rounded p-4">
+                      <p className="text-black-400 text-xs">
+                        Dibuat tanggal{" "}
+                        {new Date(quiz.createdAt).toLocaleDateString(
+                          "id-ID", {
                           day: "numeric",
                           month: "long",
                           year: "numeric",
-                        })}
+                        }
+                        )}
                       </p>
-                      <div className="d-flex">
-                        <Button
-                          variant="outlined-secondary"
-                          size="sm"
-                          className="btn-sm mr-2"
-                          style={{
-                            fontSize: "9px",
-                          }}
-                          onClick={() => handleDelete(quiz.id)}
-                        >
-                          <GoTrash
-                            style={{ fontSize: "14px", color: "#FF0000" }}
-                          />
-                        </Button>
-                        <Button
-                          variant="outlined-secondary"
-                          size="sm"
-                          className="btn-sm"
-                          style={{
-                            fontSize: "9px",
-                          }}
-                        >
-                          <FaRegEdit
-                            style={{ fontSize: "14px", color: "#38B0AB" }}
-                          />
-                        </Button>
-                        <Button
-                          variant="outlined-secondary"
-                          size="sm"
-                          className="btn-sm mr-2"
-                          style={{
-                            fontSize: "9px",
-                          }}
-                        >
-                          <CiShare2
-                            style={{ fontSize: "14px", color: "#38B0AB" }}
-                          />
-                        </Button>
-                      </div>
                     </div>
-                  </Card.Body>
-                </Card>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => handleDeleteQuiz(quiz.id)}
+                        className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
+                      >
+                        <MdDeleteOutline />
+                        <p className="text-[5px]"></p>
+                      </button>
+                      <button
+                        onClick={() => handleEditQuiz(quiz.id)}
+                        className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
+                      >
+                        <FaRegEdit />
+                        <p className="text-[5px]"></p>
+                      </button>
+                      <button
+                        onClick={() => setModalShow(true)}
+                        className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded mr-2"
+                      >
+                        <CopyToClipboard text={quiz.link} onCopy={handleShareClick}>
+                          <div className="flex flex-col items-center justify-center">
+                            <CiShare2 className="" />
+                            <p className="text-[5px] m-0"></p>
+                          </div>
+                        </CopyToClipboard>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               ))}
-            </Row>
-          </Container>
+            </div>
+          </div>
         </div>
-      </Container>
+      </div>
     </div>
   );
 };
+
 
 export default MyQuiz;

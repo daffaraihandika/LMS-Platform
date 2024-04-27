@@ -5,7 +5,8 @@ import { CiShare2 } from "react-icons/ci";
 import { GoReport } from "react-icons/go";
 import { MdFormatListBulleted } from "react-icons/md";
 import { TbCategory } from "react-icons/tb";
-import NavbarQuiz from "../components/NavbarQuiz";
+// import NavbarQuiz from "../components/NavbarQuiz";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 const QuizKreatif = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -13,8 +14,10 @@ const QuizKreatif = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalShow, setModalShow] = useState(false);
   const [link, setLink] = useState("");
-  const [selectedReason, setSelectedReason] = useState("");
   const navigate = useNavigate();
+  const [copied, setCopied] = useState(false);
+  const [selectedReason, setSelectedReason] = useState("");
+  const [currentQuizId, setCurrentQuizId] = useState(null);
 
   const handleTambahQuizClick = () => {
     navigate("/tambah-quiz");
@@ -27,6 +30,7 @@ const QuizKreatif = () => {
         //"http://localhost:5000/quizzes"
       );
       setQuizzes(response.data);
+      console.log(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -46,12 +50,70 @@ const QuizKreatif = () => {
   };
 
   const handleSaveChanges = () => {
-    console.log("Link:", link);
+    let formattedLink = link;
+    if (
+      !formattedLink.startsWith("http://") &&
+      !formattedLink.startsWith("https://")
+    ) {
+      formattedLink = "http://" + formattedLink;
+    }
     handleClose();
+    window.open(formattedLink, "_blank");
+  };
+
+  const handleShareClick = () => {
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 1500);
   };
 
   const handleRadioChange = (event) => {
     setSelectedReason(event.target.value);
+  };
+
+  const handleDropdownChange = async (event) => {
+    let tag = event.target.value;
+    try {
+      let response;
+      if (tag === "Semua") {
+        response = await axios.get("http://194.233.93.124:3030/quiz/quizzes");
+      } else {
+        response = await axios.get(
+          `http://194.233.93.124:3030/quiz/quizzes?tag=${tag}`
+        );
+      }
+      setQuizzes(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleReportSubmit = async (quizId) => {
+    try {
+      const response = await axios.post(
+        "http://194.233.93.124:3030/quiz/report",
+        {
+          user_id: "2",
+          quiz_id: quizId,
+          report_type: selectedReason,
+        }
+      );
+
+      if (response.status === 201) {
+        alert("Thank you for your report. We will review it shortly.");
+        setModalShow(false); // Close the modal after successful report
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        alert("You have already reported this quiz.");
+      } else {
+        alert(
+          "There was an error processing your report. Please try again later."
+        );
+      }
+      console.error("Error submitting report:", error);
+    }
   };
 
   useEffect(() => {
@@ -61,30 +123,13 @@ const QuizKreatif = () => {
 
   return (
     <div>
-      {/* <div className="block">
-        {showModal && (
-          <div className="fixed inset-0 flex items-center justify-center">
-            <div className="absolute inset-0 bg-gray-900 opacity-50"></div>
-            <div className="bg-white p-8 rounded max-w-sm">
-              <button onClick={handleClose}>&times;</button>
-              <input
-                type="text"
-                value={link}
-                onChange={(e) => setLink(e.target.value)}
-                className="border rounded py-2 px-3 w-full my-2"
-                placeholder="Enter link"
-              />
-              <button
-                onClick={handleSaveChanges}
-                className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Masuk Quiz
-              </button>
-            </div>
+      {/* <NavbarQuiz /> */}
+      <div className="container mx-auto p-8">
+        {copied && (
+          <div className="fixed top-20 right-1/2 transform translate-x-1/2 bg-blue-500 text-white py-2 px-4 rounded-xl z-50">
+            Link telah di-copy!
           </div>
         )}
-      </div> */}
-      <div className="container mx-auto p-8">
         <div className="mb-4">
           <div className="flex justify-between mb-3 flex-col">
             <div>
@@ -146,10 +191,15 @@ const QuizKreatif = () => {
 
               <div className="relative inline-block text-left flex items-center">
                 <TbCategory className="mr-3 text-teal-400 text-2xl mb-5" />
-                <select className="text-sm bg-white text-gray-500 border border-gray-300 py-2 pr-48 pl-3 rounded-lg mb-4 text-left inline-flex items-center appearance-none">
-                  <option>Semua Kategori Quiz</option>
+                <select
+                  onChange={handleDropdownChange}
+                  className="text-sm bg-white text-gray-500 border border-gray-300 py-2 pr-10 pl-3 rounded-lg mb-4 text-left inline-flex items-center appearance-none"
+                >
+                  <option value="Semua">Semua Kategori Quiz</option>
                   {tags.map((tag) => (
-                    <option key={tag.id}>{tag.nama_tag}</option>
+                    <option key={tag.id} value={tag.nama_tag}>
+                      {tag.nama_tag}
+                    </option>
                   ))}
                 </select>
                 <div className="absolute right-2 transform -translate-y-1/2 pointer-events-none">
@@ -218,7 +268,7 @@ const QuizKreatif = () => {
                         </div>
                         <div className="flex items-center px-3 gap-2">
                           <MdFormatListBulleted className="text-orange-400" />
-                          <p>10 Qs</p>
+                          <p>{quiz.jumlahSoal} Qs</p>
                         </div>
                       </div>
                     </div>
@@ -237,13 +287,26 @@ const QuizKreatif = () => {
                         Mulai Quiz
                       </button>
                       <div className="flex">
-                        <button className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500   rounded mr-2">
-                          <CiShare2 className="" />
-                          <p className="text-[9px]">Bagikan</p>
+                        <button className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500  border border-teal-500 rounded mr-2">
+                          <CopyToClipboard
+                            text={quiz.link}
+                            onCopy={handleShareClick}
+                          >
+                            <div
+                              onClick={handleShareClick}
+                              className="flex flex-col items-center justify-center"
+                            >
+                              <CiShare2 className="" />
+                              <p className="text-[9px] m-0">Bagikan</p>
+                            </div>
+                          </CopyToClipboard>
                         </button>
                         <button
-                          onClick={() => setModalShow(true)}
-                          className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500  rounded"
+                          onClick={() => {
+                            setModalShow(true);
+                            setCurrentQuizId(quiz.id);
+                          }}
+                          className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
                         >
                           <GoReport className="" />
                           <p className="text-[9px]">Laporkan</p>
