@@ -9,7 +9,7 @@ import { MdDeleteOutline } from "react-icons/md";
 import { MdFormatListBulleted } from "react-icons/md";
 import { TbCategory } from "react-icons/tb";
 // import NavbarQuiz from "../components/NavbarQuiz";
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { CopyToClipboard } from "react-copy-to-clipboard";
 import { IoIosSearch } from "react-icons/io";
 
 const MyQuiz = () => {
@@ -21,7 +21,7 @@ const MyQuiz = () => {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const { userId } = useParams();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [showCopyNotification, setShowCopyNotification] = useState(false);
 
   const handleTambahQuizClick = () => {
@@ -55,7 +55,10 @@ const MyQuiz = () => {
 
   const handleSaveChanges = () => {
     let formattedLink = link;
-    if (!formattedLink.startsWith("http://") && !formattedLink.startsWith("https://")) {
+    if (
+      !formattedLink.startsWith("http://") &&
+      !formattedLink.startsWith("https://")
+    ) {
       formattedLink = "http://" + formattedLink;
     }
     handleClose();
@@ -70,10 +73,14 @@ const MyQuiz = () => {
   };
 
   const handleDeleteQuiz = async (quizId) => {
-    const confirmDelete = window.confirm("Apakah anda yakin ingin menghapus quiz ini?");
+    const confirmDelete = window.confirm(
+      "Apakah anda yakin ingin menghapus quiz ini?"
+    );
     if (confirmDelete) {
       try {
-        const response = await axios.delete(`http://194.233.93.124:3030/quiz/quiz/${quizId}`);
+        const response = await axios.delete(
+          `http://194.233.93.124:3030/quiz/quiz/${quizId}`
+        );
         console.log(response.data);
         getMyQuiz();
       } catch (error) {
@@ -82,7 +89,6 @@ const MyQuiz = () => {
       }
     }
   };
-
 
   const handleEditQuiz = (quizId) => {
     navigate(`/edit-quiz/${quizId}`);
@@ -94,14 +100,17 @@ const MyQuiz = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get(`http://194.233.93.124:3030/quiz/quizzes/user/${userId}?search=${encodeURIComponent(searchTerm)}`);
+      const response = await axios.get(
+        `http://194.233.93.124:3030/quiz/quizzes/user/${userId}?search=${encodeURIComponent(
+          searchTerm
+        )}`
+      );
       setQuizzes(response.data);
       console.log(response.data);
     } catch (error) {
       console.error("Error fetching quizzes:", error);
     }
   };
-
 
   useEffect(() => {
     getMyQuiz();
@@ -162,7 +171,7 @@ const MyQuiz = () => {
                   value={searchTerm}
                   onChange={handleInputChange}
                   onKeyPress={(event) => {
-                    if (event.key === 'Enter') {
+                    if (event.key === "Enter") {
                       handleSearch();
                     }
                   }}
@@ -172,7 +181,6 @@ const MyQuiz = () => {
                   onClick={handleSearch}
                 />
               </div>
-
             </div>
           </div>
 
@@ -229,13 +237,11 @@ const MyQuiz = () => {
                     <div className="border border-gray-200 rounded p-4">
                       <p className="text-black-400 text-xs">
                         Dibuat tanggal{" "}
-                        {new Date(quiz.createdAt).toLocaleDateString(
-                          "id-ID", {
+                        {new Date(quiz.createdAt).toLocaleDateString("id-ID", {
                           day: "numeric",
                           month: "long",
                           year: "numeric",
-                        }
-                        )}
+                        })}
                       </p>
                     </div>
                     <div className="flex gap-1">
@@ -257,7 +263,10 @@ const MyQuiz = () => {
                         onClick={() => setModalShow(true)}
                         className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded mr-2"
                       >
-                        <CopyToClipboard text={quiz.link} onCopy={handleShareClick}>
+                        <CopyToClipboard
+                          text={quiz.link}
+                          onCopy={handleShareClick}
+                        >
                           <div className="flex flex-col items-center justify-center">
                             <CiShare2 className="" />
                             <p className="text-[5px] m-0"></p>
@@ -275,6 +284,5 @@ const MyQuiz = () => {
     </div>
   );
 };
-
 
 export default MyQuiz;
