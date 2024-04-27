@@ -19,6 +19,8 @@ const QuizKreatif = () => {
   const [copied, setCopied] = useState(false);
   const [selectedReason, setSelectedReason] = useState("");
   const [currentQuizId, setCurrentQuizId] = useState(null);
+  const [isQuizizzLink, setIsQuizizzLink] = useState(false);
+  const [linkError, setLinkError] = useState("");
 
   const handleTambahQuizClick = () => {
     navigate("/tambah-quiz");
@@ -94,7 +96,7 @@ const QuizKreatif = () => {
 
       if (response.status === 201) {
         alert("Thank you for your report. We will review it shortly.");
-        setModalShow(false);  // Close the modal after successful report
+        setModalShow(false); 
       }
     } catch (error) {
       if (error.response && error.response.status === 409) {
@@ -106,6 +108,22 @@ const QuizKreatif = () => {
     }
   };
 
+  const validateLink = (inputLink) => {
+    const quizizzPattern = /^https?:\/\/(www\.)?quizizz\.com/; // Regex pattern for checking if it's a Quizizz link
+    return quizizzPattern.test(inputLink);
+  };
+
+  const handleLinkChange = (event) => {
+    const inputLink = event.target.value;
+    setLink(inputLink);
+    if (validateLink(inputLink)) {
+      setIsQuizizzLink(true);
+      setLinkError("");
+    } else {
+      setIsQuizizzLink(false);
+      setLinkError("Please enter a valid Quizizz link.");
+    }
+  };
 
   useEffect(() => {
     getAllQuiz();
@@ -145,7 +163,6 @@ const QuizKreatif = () => {
                     <div className="fixed inset-0 bg-black opacity-50 z-[30]"></div>
                     <div className="fixed inset-0 flex items-center justify-center z-[99]">
                       <div className="bg-white rounded-lg p-6 w-1/2">
-                        {/* Konten modal */}
                         <h2 className="text-lg font-bold mb-4 w-full">
                           Masukkan Link Quiz
                         </h2>
@@ -154,11 +171,12 @@ const QuizKreatif = () => {
                             <input
                               type="text"
                               value={link}
-                              onChange={(e) => setLink(e.target.value)}
+                              onChange={handleLinkChange}
                               className="border rounded py-2 px-3 w-full my-2"
                               placeholder="Enter link"
                             />
                           </p>
+                          {linkError && <p className="text-red-500 text-xs italic">{linkError}</p>}
                           <div className="flex justify-end gap-2">
                             <button
                               onClick={() => setShowModal(false)}
@@ -168,7 +186,8 @@ const QuizKreatif = () => {
                             </button>
                             <button
                               onClick={handleSaveChanges}
-                              className="bg-teal-500 hover:bg-teal-700 text-white text-sm px-4 py-1 mt-4 rounded"
+                              disabled={!isQuizizzLink}
+                              className={`${isQuizizzLink ? "bg-teal-500 hover:bg-teal-700" : "bg-gray-300 cursor-not-allowed"} text-white text-sm px-4 py-1 mt-4 rounded`}
                             >
                               Masuk Quiz
                             </button>
@@ -387,7 +406,7 @@ const QuizKreatif = () => {
                               </div>
                               <div className="flex justify-end">
                                 <button
-                                  onClick={() => handleReportSubmit(currentQuizId)} 
+                                  onClick={() => handleReportSubmit(currentQuizId)}
                                   disabled={!selectedReason}
                                   className={`${selectedReason ? "bg-teal-500 hover:bg-teal-700" : "bg-gray-300 cursor-not-allowed"} text-white text-sm py-2 px-4 rounded-md mt-4`}
                                 >
