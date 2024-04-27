@@ -237,7 +237,7 @@ const MyQuiz = () => {
                       ))}
                     </div>
                     <div className="mt-5 flex justify-between items-start w-full">
-                      <div className="border border-gray-200 rounded p-4">
+                      <div className="p-2">
                         <p className="text-black-400 text-xs">
                           Dibuat tanggal{" "}
                           {new Date(quiz.createdAt).toLocaleDateString(
@@ -253,21 +253,21 @@ const MyQuiz = () => {
                       <div className="flex gap-1">
                         <button
                           onClick={() => handleDeleteQuiz(quiz.id)}
-                          className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
+                          className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 rounded"
                         >
                           <MdDeleteOutline />
                           <p className="text-[5px]"></p>
                         </button>
                         <button
                           onClick={() => handleEditQuiz(quiz.id)}
-                          className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
+                          className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 rounded"
                         >
                           <FaRegEdit />
                           <p className="text-[5px]"></p>
                         </button>
                         <button
                           onClick={() => setModalShow(true)}
-                          className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded mr-2"
+                          className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 rounded mr-2"
                         >
                           <CopyToClipboard
                             text={quiz.link}
