@@ -166,7 +166,7 @@ const MyQuiz = () => {
               <div className="mb-4 relative">
                 <input
                   type="text"
-                  className="text-sm bg-white text-gray-500 border border-gray-300 py-2 pl-3 rounded-lg text-left inline-flex items-center w-full"
+                  className="text-sm bg-white text-gray-500 border border-gray-300 py-2 pl-5 rounded-lg text-left inline-flex items-center w-full"
                   placeholder="Find My Quiz"
                   value={searchTerm}
                   onChange={handleInputChange}
@@ -186,97 +186,114 @@ const MyQuiz = () => {
 
           <div className="container bg-slate-50 mx-auto p-6 rounded-lg">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {quizzes.map((quiz) => (
-                <div
-                  key={quiz.id}
-                  className="max-w-sm rounded-lg overflow-hidden shadow-lg p-5 bg-white"
-                >
-                  <div className="font-semibold text-xl mb-4">{quiz.title}</div>
-                  {quiz.image && (
-                    <div>
-                      <img
-                        className="object-cover w-96 h-48 rounded"
-                        src={quiz.image}
-                        alt={quiz.title}
-                      />
+              {quizzes.length > 0 ? (
+                quizzes.map((quiz) => (
+                  <div
+                    key={quiz.id}
+                    className="max-w-sm rounded-lg overflow-hidden shadow-lg p-5 bg-white"
+                  >
+                    <div className="font-semibold text-xl mb-4">
+                      {quiz.title}
                     </div>
-                  )}
+                    {quiz.image && (
+                      <div>
+                        <img
+                          className="object-cover w-96 h-48 rounded"
+                          src={quiz.image}
+                          alt={quiz.title}
+                        />
+                      </div>
+                    )}
 
-                  <div className="flex items-center mt-5 gap-3">
-                    <div className="flex h-full items-center">
-                      <img
-                        className="h-10 w-10 rounded-full"
-                        src="https://3.bp.blogspot.com/-oa9m6Vjs78s/VMCqdcEo_lI/AAAAAAAAAqw/3GeZJLcpCYQ/s1600/IMG_0008.JPG"
-                      />
-                    </div>
-                    <div className="flex w-full justify-between mt-2 mb-2">
-                      <div className="flex-col">
-                        <div>
-                          <span className="text-sm text-gray-950">
-                            Anya Felissa
-                          </span>
+                    <div className="flex items-center mt-5 gap-3">
+                      <div className="flex h-full items-center">
+                        <img
+                          className="h-10 w-10 rounded-full"
+                          src="https://3.bp.blogspot.com/-oa9m6Vjs78s/VMCqdcEo_lI/AAAAAAAAAqw/3GeZJLcpCYQ/s1600/IMG_0008.JPG"
+                        />
+                      </div>
+                      <div className="flex w-full justify-between mt-2 mb-2">
+                        <div className="flex-col">
+                          <div>
+                            <span className="text-sm text-gray-950">
+                              Anya Felissa
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center px-3 gap-2">
+                          <MdFormatListBulleted className="text-orange-400" />
+                          <p>{quiz.jumlahSoal} Qs</p>
                         </div>
                       </div>
-                      <div className="flex items-center px-3 gap-2">
-                        <MdFormatListBulleted className="text-orange-400" />
-                        <p>{quiz.jumlahSoal} Qs</p>
+                    </div>
+                    <div className="mt-5">
+                      {quiz.tags.map((tag) => (
+                        <span
+                          key={tag.id}
+                          className="inline-block bg-orange-300 rounded-md px-3 py-1 text-xs text-red-600 mr-2"
+                        >
+                          {tag.nama_tag}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="mt-5 flex justify-between items-start w-full">
+                      <div className="border border-gray-200 rounded p-4">
+                        <p className="text-black-400 text-xs">
+                          Dibuat tanggal{" "}
+                          {new Date(quiz.createdAt).toLocaleDateString(
+                            "id-ID",
+                            {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            }
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => handleDeleteQuiz(quiz.id)}
+                          className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
+                        >
+                          <MdDeleteOutline />
+                          <p className="text-[5px]"></p>
+                        </button>
+                        <button
+                          onClick={() => handleEditQuiz(quiz.id)}
+                          className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
+                        >
+                          <FaRegEdit />
+                          <p className="text-[5px]"></p>
+                        </button>
+                        <button
+                          onClick={() => setModalShow(true)}
+                          className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded mr-2"
+                        >
+                          <CopyToClipboard
+                            text={quiz.link}
+                            onCopy={handleShareClick}
+                          >
+                            <div className="flex flex-col items-center justify-center">
+                              <CiShare2 className="" />
+                              <p className="text-[5px] m-0"></p>
+                            </div>
+                          </CopyToClipboard>
+                        </button>
                       </div>
                     </div>
                   </div>
-                  <div className="mt-5">
-                    {quiz.tags.map((tag) => (
-                      <span
-                        key={tag.id}
-                        className="inline-block bg-orange-300 rounded-md px-3 py-1 text-xs text-red-600 mr-2"
-                      >
-                        {tag.nama_tag}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="mt-5 flex justify-between items-start w-full">
-                    <div className="border border-gray-200 rounded p-4">
-                      <p className="text-black-400 text-xs">
-                        Dibuat tanggal{" "}
-                        {new Date(quiz.createdAt).toLocaleDateString("id-ID", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </p>
-                    </div>
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => handleDeleteQuiz(quiz.id)}
-                        className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
-                      >
-                        <MdDeleteOutline />
-                        <p className="text-[5px]"></p>
-                      </button>
-                      <button
-                        onClick={() => handleEditQuiz(quiz.id)}
-                        className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded"
-                      >
-                        <FaRegEdit />
-                        <p className="text-[5px]"></p>
-                      </button>
-                      <button
-                        onClick={() => setModalShow(true)}
-                        className="items-center flex-col flex px-2 py-1 bg-white hover:bg-gray-300 text-teal-500 border border-teal-500 rounded mr-2"
-                      >
-                        <CopyToClipboard
-                          text={quiz.link}
-                          onCopy={handleShareClick}
-                        >
-                          <div className="flex flex-col items-center justify-center">
-                            <CiShare2 className="" />
-                            <p className="text-[5px] m-0"></p>
-                          </div>
-                        </CopyToClipboard>
-                      </button>
-                    </div>
-                  </div>
+                ))
+              ) : (
+                <div
+                  className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+                  role="alert"
+                >
+                  <strong className="font-bold">
+                    Quiz yang kamu cari tidak tersedia !
+                  </strong>
+                  <span className="absolute top-0 bottom-0 right-0 px-4 py-3"></span>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
