@@ -104,7 +104,7 @@ const QuizKreatif = () => {
 
       if (response.status === 201) {
         alert("Thank you for your report. We will review it shortly.");
-        setModalShow(false); 
+        setModalShow(false);
       }
     } catch (error) {
       if (error.response && error.response.status === 409) {
@@ -365,15 +365,15 @@ const QuizKreatif = () => {
                                           <br />
                                           <p className="text-sm">
                                             Quiz atau pertanyaan dalam quiz
-                                            merupakan plagiat dari sumber lain
-                                            tanpa izin atau atribusi yang tepat
+                                            merupakan plagiat dari sumber lain tanpa
+                                            izin atau atribusi yang tepat
                                           </p>
                                         </label>
                                         <input
                                           type="radio"
                                           id="plagiat"
                                           name="reportReason"
-                                          value="plagiat"
+                                          value="Plagiat"
                                           className="form-radio h-4 w-4 text-teal-500"
                                           onChange={handleRadioChange}
                                         />
@@ -386,9 +386,8 @@ const QuizKreatif = () => {
                                           <b>Privasi</b>
                                           <br />
                                           <p className="text-sm">
-                                            Membagikan informasi pribadi,
-                                            mengancam akan
-                                            membagikan/menyebarkan informasi
+                                            Membagikan informasi pribadi, mengancam
+                                            akan membagikan/menyebarkan informasi
                                             pribadi
                                           </p>
                                         </label>
@@ -396,7 +395,7 @@ const QuizKreatif = () => {
                                           type="radio"
                                           id="privasi"
                                           name="reportReason"
-                                          value="privasi"
+                                          value="Privasi"
                                           className="form-radio h-4 w-4 text-teal-500"
                                           onChange={handleRadioChange}
                                         />
@@ -411,17 +410,16 @@ const QuizKreatif = () => {
                                           </b>
                                           <br />
                                           <p className="text-sm">
-                                            Penghinaan, konten seksual yang
-                                            tidak diinginkan, konten NSFW &
-                                            grafis yang tidak diinginkan,
-                                            pelecehan bertarget
+                                            Penghinaan, konten seksual yang tidak
+                                            diinginkan, konten NSFW & grafis yang
+                                            tidak diinginkan, pelecehan bertarget
                                           </p>
                                         </label>
                                         <input
                                           type="radio"
                                           id="penghinaan"
                                           name="reportReason"
-                                          value="penghinaan"
+                                          value="Penghinaan & Pelecehan secara Online"
                                           className="form-radio h-4 w-4 text-teal-500"
                                           onChange={handleRadioChange}
                                         />
@@ -430,12 +428,9 @@ const QuizKreatif = () => {
                                   </div>
                                   <div className="flex justify-end">
                                     <button
+                                      onClick={() => handleReportSubmit(currentQuizId)}
                                       disabled={!selectedReason}
-                                      className={`${
-                                        selectedReason
-                                          ? "bg-teal-500 hover:bg-teal-700"
-                                          : "bg-gray-300 cursor-not-allowed"
-                                      } text-white text-sm py-2 px-4 rounded-md mt-4`}
+                                      className={`${selectedReason ? "bg-teal-500 hover:bg-teal-700" : "bg-gray-300 cursor-not-allowed"} text-white text-sm py-2 px-4 rounded-md mt-4`}
                                     >
                                       Laporkan
                                     </button>
