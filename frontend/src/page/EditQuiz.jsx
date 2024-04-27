@@ -65,9 +65,60 @@ const EditQuiz = () => {
         setShowQuizizView(true);
     };
 
-    const handlePrevClick = () => {
-        setShowQuizizView(false);
-    };
+  const handlePrevClick = () => {
+    setIsLoading(false);
+    setShowQuizizView(false);
+  };
+
+  const handleBackClick = () => {
+    navigate('/');
+  };
+
+  const handleTagChange = (selectedOptions) => {
+    console.log(selectedOptions);
+    setTags(selectedOptions);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === ' ' && event.target.value.trim() !== '') {
+      const newTag = { value: event.target.value.trim(), label: event.target.value.trim() };
+      setTags([...tags, newTag]);
+      event.target.value = '';
+      event.preventDefault();
+    }
+  };
+
+  const handleFileInputChange = (event) => {
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setSelectedFileName(selectedFile.name);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const droppedFile = e.dataTransfer.files[0];
+    setFile(droppedFile);
+    setSelectedFileName(droppedFile.name);
+  };
+
+  const getAllTag = async () => {
+    try {
+      const response = await axios.get("http://194.233.93.124:3030/quiz/tags");
+      console.log(response.data); 
+      setTagOptions(response.data.map(tag => ({ value: tag.nama_tag, label: tag.nama_tag })));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
     const handleSave = async () => {
         setIsLoading(true);
