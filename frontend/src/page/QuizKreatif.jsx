@@ -445,10 +445,12 @@ const QuizKreatif = () => {
                   ))
                 ) : (
                   <div
-                    className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+                    className="px-4 py-3 rounded relative"
                     role="alert"
                   >
-                    <strong className="font-bold">Data tidak tersedia!</strong>
+                    <p className="font-bold">
+                      Quiz yang kamu cari tidak tersedia !
+                    </p>
                     <span className="absolute top-0 bottom-0 right-0 px-4 py-3"></span>
                   </div>
                 )}
